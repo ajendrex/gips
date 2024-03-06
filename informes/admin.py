@@ -1,3 +1,45 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
-# Register your models here.
+from informes.models import Prueba, Pregunta, Alternativa
+
+
+class PreguntaAdminMixin:
+    def texto_formato_html(self, instance):
+        """Renderiza el campo 'texto' como HTML seguro en el admin."""
+        return format_html(instance.texto)
+
+    texto_formato_html.short_description = "Texto"  # Nombre que aparecerá en el Admin
+
+
+class PreguntaInline(admin.TabularInline, PreguntaAdminMixin):
+    model = Pregunta
+    extra = 0
+    readonly_fields = ('texto_formato_html', 'pagina', 'posicion', 'id_externo')
+    exclude = 'texto',
+    show_change_link = True
+
+
+@admin.register(Prueba)
+class PruebaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
+    readonly_fields = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
+    exclude = ('metadata', 'parametros_evaluacion', 'algoritmo_evaluacion')
+    search_fields = 'nombre',
+    list_filter = 'plataforma',
+    inlines = PreguntaInline,
+
+
+class AlternativaInline(admin.TabularInline):
+    model = Alternativa
+    extra = 0
+    readonly_fields = ('texto', 'posicion', 'id_externo')
+
+
+@admin.register(Pregunta)
+class PreguntaAdmin(admin.ModelAdmin, PreguntaAdminMixin):
+    list_display = ('prueba', 'pagina', 'posicion', 'id_externo', 'texto_formato_html')
+    readonly_fields = ('prueba', 'pagina', 'posicion', 'id_externo', 'texto_formato_html')
+    exclude = 'texto',
+    list_filter = 'prueba',
+    inlines = AlternativaInline,
