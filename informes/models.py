@@ -24,6 +24,18 @@ class AlgoritmoEvaluacion(models.Model):
         return f"{self.nombre} ({self.clase})"
 
 
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=255, unique=True)
+    descripcion = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = 'Categoría'
+        verbose_name_plural = 'Categorías'
+
+    def __str__(self):
+        return self.nombre
+
+
 class Prueba(models.Model):
     nombre = models.CharField(max_length=255)
     plataforma = models.CharField(max_length=255)
@@ -32,6 +44,7 @@ class Prueba(models.Model):
     algoritmo_evaluacion = models.ForeignKey(AlgoritmoEvaluacion, on_delete=models.RESTRICT, null=True)
     parametros_evaluacion = models.JSONField(null=True)
     metadata = models.JSONField()
+    categorias = models.ManyToManyField(Categoria, blank=True)
 
     def __str__(self):
         return f"{self.nombre} ({self.plataforma})"
@@ -43,6 +56,7 @@ class Pregunta(models.Model):
     posicion = models.IntegerField()
     id_externo = models.CharField(max_length=255)
     texto = models.TextField()
+    categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pagina}.{self.posicion})"

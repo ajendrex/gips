@@ -1,7 +1,14 @@
 from django.contrib import admin
+from django.forms import BaseInlineFormSet
 from django.utils.html import format_html
 
-from informes.models import Prueba, Pregunta, Alternativa
+from informes.models import Prueba, Pregunta, Alternativa, Categoria
+
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'descripcion')
+    search_fields = 'nombre',
 
 
 class PreguntaAdminMixin:
@@ -12,12 +19,20 @@ class PreguntaAdminMixin:
     texto_formato_html.short_description = "Texto"  # Nombre que aparecerá en el Admin
 
 
+class PreguntaInlineFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.form.base_fields['categoria'].queryset = self.instance.categorias.all()
+
+
 class PreguntaInline(admin.TabularInline, PreguntaAdminMixin):
     model = Pregunta
     extra = 0
     readonly_fields = ('texto_formato_html', 'pagina', 'posicion', 'id_externo')
     exclude = 'texto',
     show_change_link = True
+    formset = PreguntaInlineFormSet
 
 
 @admin.register(Prueba)
@@ -28,6 +43,7 @@ class PruebaAdmin(admin.ModelAdmin):
     search_fields = 'nombre',
     list_filter = 'plataforma',
     inlines = PreguntaInline,
+    filter_horizontal = 'categorias',
 
 
 class AlternativaInline(admin.TabularInline):
@@ -43,3 +59,10 @@ class PreguntaAdmin(admin.ModelAdmin, PreguntaAdminMixin):
     exclude = 'texto',
     list_filter = 'prueba',
     inlines = AlternativaInline,
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj:
+            categoria_field = form.base_fields['categoria']
+            categoria_field.queryset = obj.prueba.categorias.all()
+        return form
