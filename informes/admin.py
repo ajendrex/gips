@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.db import models
 from django.forms import BaseInlineFormSet
 from django.utils.html import format_html
+from django_json_widget.widgets import JSONEditorWidget
 
 from informes.models import Prueba, Pregunta, Alternativa, Categoria
 
@@ -39,11 +41,15 @@ class PreguntaInline(admin.TabularInline, PreguntaAdminMixin):
 class PruebaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
     readonly_fields = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
-    exclude = ('metadata', 'parametros_evaluacion', 'algoritmo_evaluacion')
+    exclude = ('metadata',)
     search_fields = 'nombre',
     list_filter = 'plataforma',
     inlines = PreguntaInline,
     filter_horizontal = 'categorias',
+    formfield_overrides = {
+        # fields.JSONField: {'widget': JSONEditorWidget}, # if django < 3.1
+        models.JSONField: {'widget': JSONEditorWidget},
+    }
 
 
 class AlternativaInline(admin.TabularInline):

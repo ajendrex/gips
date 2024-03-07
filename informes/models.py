@@ -41,7 +41,7 @@ class Prueba(models.Model):
     plataforma = models.CharField(max_length=255)
     fecha_creacion = models.DateTimeField()
     fecha_actualizacion = models.DateTimeField()
-    algoritmo_evaluacion = models.ForeignKey(AlgoritmoEvaluacion, on_delete=models.RESTRICT, null=True)
+    algoritmo_evaluacion = models.ForeignKey(AlgoritmoEvaluacion, on_delete=models.RESTRICT, null=True, blank=True)
     parametros_evaluacion = models.JSONField(null=True)
     metadata = models.JSONField()
     categorias = models.ManyToManyField(Categoria, blank=True)
