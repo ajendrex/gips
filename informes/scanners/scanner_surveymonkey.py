@@ -1,17 +1,20 @@
+import logging
 from zoneinfo import ZoneInfo
 from datetime import datetime
-from typing import Generator, TypedDict, List
+from typing import Generator, TypedDict, List, Tuple, Dict
 
 import requests
+from bs4 import BeautifulSoup
 
 from django.conf import settings
-from django.utils.timezone import make_aware
+from django.utils.timezone import make_aware, is_aware
 
-from informes.models import Prueba, Pregunta, Alternativa
+from informes.models import Prueba, Pregunta, Alternativa, Persona, Resultado, Respuesta
 from informes.scanners.base import Scanner
 
 BASE_URL = 'https://api.surveymonkey.com/v3'
 UTC = ZoneInfo('UTC')
+logger = logging.getLogger(__name__)
 
 
 class SurveyMonkeyChoiceDict(TypedDict):
@@ -25,6 +28,7 @@ class SurveyMonkeyQuestionDict(TypedDict):
     page: int
     position: int
     id: str
+    type: str
     text: str
     choices: List[SurveyMonkeyChoiceDict]
 
@@ -40,6 +44,8 @@ class SurveyMonkeyPruebaDict(TypedDict):
 
 
 class ScannerSurveyMonkey(Scanner):
+    PLATAFORMA = "SurveyMonkey"
+
     def _post_init(self):
         self.session = requests.Session()
         self.session.headers.update({
@@ -58,7 +64,8 @@ class ScannerSurveyMonkey(Scanner):
             data = response.json()
 
             for obj in data['data']:
-                yield self._get_prueba_dict(obj)
+                resp = self.session.get(obj['href'] + '/details')
+                yield resp.json()
 
             new_page = data['links'].get('next')
 
@@ -67,31 +74,50 @@ class ScannerSurveyMonkey(Scanner):
             else:
                 break
 
-    def _get_prueba_dict(self, obj: dict) -> SurveyMonkeyPruebaDict:
-        resp = self.session.get(obj["href"] + "/details")
-        data = resp.json()
-        return {
-            'title': data['title'],
-            'nickname': data['nickname'],
-            'date_created': data['date_created'],
-            'date_modified': data['date_modified'],
-            'id': data['id'],
-            'href': data['href'],
-            'questions': self._get_questions_from_survey_pages(data["pages"])
-        }
-
-    def _get_questions_from_survey_pages(self, pages: List[dict]) -> List[SurveyMonkeyQuestionDict]:
-        questions = []
-        for page in pages:
+    def _generate_questions_and_choices(
+        self,
+        prueba: Prueba,
+        prueba_dict: dict,
+    ) -> Generator[Tuple[Pregunta, List[Alternativa]], None, None]:
+        for page in prueba_dict["pages"]:
             for question in page["questions"]:
-                questions.append({
-                    'page': page["position"],
-                    'position': question["position"],
-                    'id': question["id"],
-                    'text': question["headings"][0]["heading"],
-                    'choices': self._get_choices_from_question(question)
-                })
-        return questions
+                if question["family"] == "open_ended":
+                    for row in question["answers"]["rows"]:
+                        pregunta = Pregunta(
+                            prueba=prueba,
+                            pagina=page["position"],
+                            posicion=question["position"],
+                            tipo="open_ended",
+                            plataforma=self.PLATAFORMA,
+                            id_plataforma="_".join([question["id"], row["id"]]),
+                            texto=row["text"],
+                        )
+                        yield pregunta, []
+                else:
+                    pregunta = Pregunta(
+                        prueba=prueba,
+                        pagina=page["position"],
+                        posicion=question["position"],
+                        tipo=question["family"],
+                        plataforma=self.PLATAFORMA,
+                        id_plataforma=question["id"],
+                        texto=self._extract_text_from_html(question["headings"][0]["heading"]),
+                    )
+                    choices = [
+                        Alternativa(
+                            posicion=choice["position"],
+                            id_plataforma=choice["id"],
+                            texto=choice["text"],
+                            puntaje=choice["score"],
+                        )
+                        for choice in self._get_choices_from_question(question)
+                    ]
+                    yield pregunta, choices
+
+    @staticmethod
+    def _extract_text_from_html(html: str) -> str:
+        soup = BeautifulSoup(html, 'html.parser')
+        return soup.get_text()
 
     @staticmethod
     def _get_choices_from_question(question: dict) -> List[SurveyMonkeyChoiceDict]:
@@ -99,9 +125,8 @@ class ScannerSurveyMonkey(Scanner):
             return []
 
         choices = []
-        answers = question["answers"]
 
-        for choice in answers["choices"]:
+        for choice in question["answers"]["choices"]:
             choices.append({
                 'id': choice["id"],
                 'position': choice["position"],
@@ -111,63 +136,85 @@ class ScannerSurveyMonkey(Scanner):
 
         return choices
 
-    def _create_prueba(self, prueba_dict: SurveyMonkeyPruebaDict) -> Prueba:
-        prueba = Prueba.objects.create(
-            nombre=prueba_dict['title'],
-            plataforma='SurveyMonkey',
-            fecha_creacion=self._str_to_datetime(prueba_dict['date_created']),
-            fecha_actualizacion=self._str_to_datetime(prueba_dict['date_modified']),
-            metadata=prueba_dict,
-        )
-
-        preguntas = []
-
-        for question in prueba_dict['questions']:
-            preguntas.append(
-                Pregunta(
-                    prueba=prueba,
-                    pagina=question['page'],
-                    posicion=question['position'],
-                    id_externo=question['id'],
-                    texto=question['text'],
-                )
-            )
-
-        id_externo_to_pregunta = {
-            pregunta.id_externo: pregunta
-            for pregunta in Pregunta.objects.bulk_create(preguntas)
-        }
-
-        alternativas = []
-
-        for question in prueba_dict['questions']:
-            pregunta = id_externo_to_pregunta[question['id']]
-
-            for choice in question['choices']:
-                alternativas.append(
-                    Alternativa(
-                        pregunta=pregunta,
-                        posicion=choice['position'],
-                        id_externo=choice['id'],
-                        texto=choice['text'],
-                        puntaje=choice['score'],
-                    )
-                )
-
-        Alternativa.objects.bulk_create(alternativas)
-
-        return prueba
-
     @staticmethod
     def _str_to_datetime(date_str: str) -> datetime:
-        return make_aware(datetime.fromisoformat(date_str), timezone=UTC)
+        dt = datetime.fromisoformat(date_str)
+
+        return dt if is_aware(dt) else make_aware(dt, timezone=UTC)
+
+    def _get_id_prueba(self, prueba_dict: dict) -> str:
+        return prueba_dict['id']
+
+    def _get_fecha_creacion_prueba(self, prueba_dict: dict) -> datetime:
+        return self._str_to_datetime(prueba_dict['date_created'])
+
+    def _get_fecha_actualizacion_prueba(self, prueba_dict: dict) -> datetime:
+        return self._str_to_datetime(prueba_dict['date_modified'])
+
+    def _get_nombre_prueba(self, prueba_dict: dict) -> str:
+        return prueba_dict['title']
 
     def _scan_nuevas_respuestas(
             self,
             prueba: Prueba,
             from_dt: datetime,
     ) -> Generator[List[dict], None, None]:
-        raise NotImplementedError
+        url = f"{BASE_URL}/surveys/{prueba.metadata['id']}/responses/bulk"
+        response = self.session.get(url, params={'start_modified_at': from_dt.isoformat(timespec="seconds")})
 
-    def _create_resultado(self, prueba, resp):
-        raise NotImplementedError
+        yield from self._yield_paginated(response)
+
+    def _iter_respuestas(self, prueba: Prueba, resp: dict) -> Generator[Tuple[Pregunta, str, dict], None, None]:
+        id_plataforma_to_pregunta = {
+            pregunta.id_plataforma: pregunta
+            for pregunta in Pregunta.objects.filter(prueba=prueba)
+        }
+        id_plataforma_to_alternativa = {
+            alternativa.id_plataforma: alternativa
+            for alternativa in Alternativa.objects.filter(pregunta__prueba=prueba)
+        }
+
+        for page in resp["pages"]:
+            for question in page["questions"]:
+                for answer in question["answers"]:
+                    choice_id = answer.get("choice_id")
+
+                    if choice_id:
+                        alternativa = id_plataforma_to_alternativa[choice_id]
+                        pregunta = id_plataforma_to_pregunta[question["id"]]
+
+                        if alternativa.pregunta != pregunta:
+                            raise ValueError(f"Alternativa {alternativa} no pertenece a la pregunta {pregunta}")
+
+                        yield pregunta, alternativa, alternativa.texto, answer
+                        continue
+
+                    row_id = answer.get("row_id")
+                    text = answer.get("text")
+
+                    pregunta = id_plataforma_to_pregunta["_".join([question["id"], row_id])]
+                    yield pregunta, None, text, answer
+
+    def _build_persona(
+        self,
+        resultado: Resultado,
+        resp: dict,
+        id_plataforma_to_respuesta: Dict[str, Respuesta],
+    ) -> Persona:
+        persona = Persona()
+
+        for campo, id_plataforma in resultado.prueba.parametros["campos_persona"].items():
+            try:
+                valor = id_plataforma_to_respuesta[id_plataforma].valor
+            except KeyError:
+                logger.info(f"No se encontró respuesta para el campo persona `{campo}`")
+            else:
+                setattr(persona, campo, valor)
+
+        return persona
+
+    def _get_id_resultado(self, resp: dict) -> str:
+        return resp["id"]
+
+    def _get_fecha_resultado(self, resp: dict) -> datetime:
+        return self._str_to_datetime(resp["date_modified"])

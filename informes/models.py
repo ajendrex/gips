@@ -1,12 +1,16 @@
+import reversion
 from django.db import models
 
 
+@reversion.register()
 class Persona(models.Model):
-    rut = models.CharField(max_length=255, unique=True)
+    rut = models.CharField(max_length=255, unique=True)  # Format must be 12.345.678-9
     nombres = models.CharField(max_length=255)
     apellido_paterno = models.CharField(max_length=255)
-    apellido_materno = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField()
+    apellido_materno = models.CharField(max_length=255, blank=True)
+    email = models.EmailField(blank=True)
+    nacionalidad = models.CharField(max_length=255, blank=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombres} {self.apellido_paterno}"
@@ -39,33 +43,42 @@ class Categoria(models.Model):
 class Prueba(models.Model):
     nombre = models.CharField(max_length=255)
     plataforma = models.CharField(max_length=255)
+    id_plataforma = models.CharField(max_length=255)
     fecha_creacion = models.DateTimeField()
     fecha_actualizacion = models.DateTimeField()
     algoritmo_evaluacion = models.ForeignKey(AlgoritmoEvaluacion, on_delete=models.RESTRICT, null=True, blank=True)
-    parametros_evaluacion = models.JSONField(null=True)
+    parametros = models.JSONField(null=True)
     metadata = models.JSONField()
     categorias = models.ManyToManyField(Categoria, blank=True)
+
+    class Meta:
+        unique_together = ('plataforma', 'id_plataforma')
 
     def __str__(self):
         return f"{self.nombre} ({self.plataforma})"
 
 
 class Pregunta(models.Model):
-    prueba = models.ForeignKey(Prueba, on_delete=models.CASCADE, related_name='preguntas')
+    prueba = models.ForeignKey(Prueba, on_delete=models.RESTRICT, related_name='preguntas')
     pagina = models.IntegerField()
     posicion = models.IntegerField()
-    id_externo = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=255)
+    plataforma = models.CharField(max_length=255)
+    id_plataforma = models.CharField(max_length=255)
     texto = models.TextField()
     categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT, null=True, blank=True)
 
+    class Meta:
+        unique_together = ('prueba_id', 'plataforma', 'id_plataforma')
+
     def __str__(self):
-        return f"({self.pagina}.{self.posicion})"
+        return self.texto
 
 
 class Alternativa(models.Model):
     pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='alternativas')
     posicion = models.IntegerField()
-    id_externo = models.CharField(max_length=255)
+    id_plataforma = models.CharField(max_length=255)
     texto = models.TextField()
     puntaje = models.FloatField()
 
@@ -74,16 +87,35 @@ class Alternativa(models.Model):
 
 
 class Resultado(models.Model):
-    persona = models.ForeignKey(Persona, on_delete=models.RESTRICT)
+    persona = models.ForeignKey(Persona, on_delete=models.RESTRICT, null=True, blank=True)
     prueba = models.ForeignKey(Prueba, on_delete=models.RESTRICT, related_name='resultados')
+    id_plataforma = models.CharField(max_length=255)
     fecha = models.DateTimeField()
     metadata = models.JSONField()
     informe = models.FileField(upload_to='informes/', null=True)
-    clave_acceso = models.CharField(max_length=255, unique=True)
-    email_envio = models.EmailField(null=True)
+    clave_acceso = models.CharField(max_length=255, unique=True, null=True)
+    email_envio = models.EmailField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('prueba', 'id_plataforma')
 
     def __str__(self):
-        return f"{self.persona} - {self.prueba} ({self.fecha})"
+        return f"{self.persona} - {self.prueba}"
+
+
+class Respuesta(models.Model):
+    resultado = models.ForeignKey(Resultado, on_delete=models.RESTRICT, related_name='respuestas')
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.RESTRICT, related_name='respuestas')
+    valor = models.CharField(max_length=255, blank=True)
+    alternativa = models.ForeignKey(Alternativa, on_delete=models.RESTRICT, null=True, blank=True)
+    metadata = models.JSONField()
+
+    class Meta:
+        verbose_name = 'Respuesta'
+        verbose_name_plural = 'Respuestas'
+
+    def __str__(self):
+        return f"{self.resultado} - {self.pregunta}"
 
 
 class EnvioEmail(models.Model):

@@ -1,0 +1,93 @@
+{
+  "campos_persona": {
+    "nombres": "74496395_596546053",
+    "apellido_paterno": "74496395_596546054",
+    "apellido_materno": "74496395_596730035",
+    "rut": "74496395_596730036",
+    "nacionalidad": "74496395_596777771",
+    "email": "74535187_596777004",
+    "telefono": "77492918_616848821"
+  },
+  "categorias": [
+    {
+      "nombre": "No Planeada",
+      "tramos": [
+        {
+          "min": 0,
+          "max": 18,
+          "texto": "Prefiere actividades tranquilas y seguras, como leer en casa o ver películas, evita situaciones desconocidas o potencialmente peligrosas."
+        },
+        {
+          "min": 19,
+          "max": 28,
+          "texto": "A veces busca nuevas experiencias, como probar nuevos deportes o explorar lugares desconocidos, pero dentro de ciertos límites de seguridad."
+        },
+        {
+          "min": 29,
+          "max": 1000,
+          "texto": "Busca constantemente emociones nuevas y fuertes, se siente cómodo en situaciones de alto riesgo y disfruta de la adrenalina que proviene de experiencias intensas. incluso si eso implica correr riesgos o desafiar normas sociales. "
+        }
+      ]
+    },
+    {
+      "nombre": "Cognitiva",
+      "tramos": [
+        {
+          "min": 0,
+          "max": 17,
+          "texto": "Tendencia a pensar antes de actuar, analizar las opciones y sus consecuencias antes de tomar decisiones."
+        },
+        {
+          "min": 18,
+          "max": 26,
+          "texto": "Tendencia a pensar antes de acutar, en ocaciones se deja llevar por la situación, deseos o sentimientos."
+        },
+        {
+          "min": 27,
+          "max": 1000,
+          "texto": "Tendencia a actuar sin pensar, a tomar decisiones rápidas sin tomar en cuenta las consecuencias."
+        }
+      ]
+    },
+    {
+      "nombre": "Motora",
+      "tramos": [
+        {
+          "min": 0,
+          "max": 15,
+          "texto": "Comportamiento cuidadoso o poco arriesgado, realiza actividades (deportes, viajes, trabajos) siguiendo protocolos o con elementos de protección corresponientes."
+        },
+        {
+          "min": 16,
+          "max": 22,
+          "texto": "Suele a quedarse quieto(a), en silencio o ser paciencte en situaciones de espera, aunque en ocaciones se deja llevar por sus impulsos."
+        },
+        {
+          "min": 23,
+          "max": 1000,
+          "texto": "Comportamiento cuidadoso o poco arriesgado, realiza actividades (deportes, viajes, trabajos) siguiendo protocolos o con elementos de protección corresponientes."
+        }
+      ]
+    },
+    {
+      "nombre": "General",
+      "tramos": [
+        {
+          "min": 0,
+          "max": 49,
+          "texto": "Bajo nivel de impulsividad y alto de autocontrol"
+        },
+        {
+          "min": 50,
+          "max": 90,
+          "texto": "Niveles moderados o normales de impulsividad y autocontrol"
+        },
+        {
+          "min": 91,
+          "max": 1000,
+          "texto": "Alto nivel de impulsividad y bajo de autocontrol"
+        }
+      ]
+    }
+  ]
+}

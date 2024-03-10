@@ -10,6 +10,8 @@ python = "^3.10"
 django = "^5.0.2"
 requests = "^2.31.0"
 django-json-widget = "^1.1.1"
+django-reversion = "^5.0.12"
+beautifulsoup4 = "^4.12.3"
 
 
 [build-system]
