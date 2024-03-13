@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .disabled-link {
+            pointer-events: none;
+            color: #aaa !important; /* Hacer el color más claro para simular estar deshabilitado */
+            cursor: default !important;
+        }
+        pre {
+            white-space: pre-wrap;       /* Since CSS 2.1 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+    </style>
+{% endblock %}
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+    <a href="evaluar/" {% if puede_evaluar %}class="button"{% else %}class="button disabled-link"{% endif %}>Evaluar</a>
+</li>
+<li>
+    <a href="generar_informe/" {% if puede_generar_informe %}class="button"{% else %}class="button disabled-link"{% endif %}>Generar informe</a>
+</li>
+{% endblock %}

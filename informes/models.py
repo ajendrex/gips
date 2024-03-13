@@ -15,6 +15,10 @@ class Persona(models.Model):
     def __str__(self):
         return f"{self.nombres} {self.apellido_paterno}"
 
+    @property
+    def nombre_completo(self) -> str:
+        return f"{self.nombres} {self.apellido_paterno} {self.apellido_materno}".strip()
+
 
 class AlgoritmoEvaluacion(models.Model):
     nombre = models.CharField(max_length=255)
@@ -92,9 +96,11 @@ class Resultado(models.Model):
     id_plataforma = models.CharField(max_length=255)
     fecha = models.DateTimeField()
     metadata = models.JSONField()
-    informe = models.FileField(upload_to='informes/', null=True)
+    evaluacion = models.JSONField(null=True)
+    informe = models.FileField(upload_to='informes/%Y/%m/%d/', null=True)
     clave_acceso = models.CharField(max_length=255, unique=True, null=True)
     email_envio = models.EmailField(null=True, blank=True)
+    uuid4 = models.UUIDField(null=True, blank=True, unique=True)
 
     class Meta:
         unique_together = ('prueba', 'id_plataforma')
@@ -133,11 +139,17 @@ class EnvioEmail(models.Model):
 
 
 class Entrevista(models.Model):
-    resultado = models.ForeignKey(Resultado, on_delete=models.RESTRICT)
+    resultado = models.OneToOneField(Resultado, on_delete=models.RESTRICT, related_name='entrevista')
     fecha = models.DateTimeField()
-    entrevistador = models.ForeignKey(Persona, on_delete=models.RESTRICT)
     observaciones = models.TextField()
-    plataforma = models.CharField(max_length=255)
+    plataforma = models.CharField(
+        max_length=255,
+        choices=(
+            ('whatsapp', 'WhatsApp'),
+            ('zoom', 'Zoom'),
+            ('meet', 'Google Meet'),
+        )
+    )
 
     def __str__(self):
-        return f"{self.resultado} - {self.entrevistador} ({self.fecha})"
+        return f"{self.resultado} - ({self.fecha})"
