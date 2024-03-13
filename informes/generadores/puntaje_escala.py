@@ -1,4 +1,7 @@
+from bs4 import BeautifulSoup
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from rut_chile import rut_chile
 from weasyprint import HTML
 
 from informes.generadores.base import Generador
@@ -6,6 +9,11 @@ from informes.generadores.base import Generador
 
 class GeneradorPuntajeEscala(Generador):
     def _validate(self):
+        rut = self.resultado.persona.rut
+
+        if not rut_chile.is_valid_rut(rut):
+            raise ValidationError(f"El rut {rut} no es válido")
+
         prueba = self.resultado.prueba
         pregunta_sin_categoria = prueba.preguntas.filter(
             categoria__isnull=True,
@@ -162,22 +170,29 @@ class GeneradorPuntajeEscala(Generador):
 
         html = f"""
         <html>
-            <head>{self._estilos()}</head>
-            <body>
-              <h1>CERTIFICADO</h1>
-              <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
-              <p>{p1}</p>
-              <p>{p2}</p>
-              <p>{p3}</p>
-              <ul>
-                <li>{texto_no_planificada}</li>
-                <li>{texto_atencional}</li>
-                <li>{texto_motora}</li>
-              </ul>
-            </body>
+          <head>{self._estilos()}</head>
+          <body>
+            <h1>CERTIFICADO</h1>
+            <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
+            <p>{p1}</p>
+            <p>{p2}</p>
+            <p>{p3}</p>
+            <ul>
+              <li>{texto_no_planificada}</li>
+              <li>{texto_atencional}</li>
+              <li>{texto_motora}</li>
+            </ul>
+            <div class="box-firma">
+              <img src="informes/assets/firmas/pruiz.png" alt="Firma Pablo Ruiz Urbina" class="firma-img" />
+              <hr>
+              <p>Pablo Ruiz Urbina<br>Psicólogo<br><span>N° Reg: 123851</span></p>
+            </div>
+          </body>
         </html>
         """
-        return HTML(string=html).write_pdf()
+        soup = BeautifulSoup(html, "html.parser")
+        print(soup.prettify())
+        return HTML(string=html, base_url=settings.BASE_DIR).write_pdf()
 
     @staticmethod
     def _estilos() -> str:
@@ -193,13 +208,26 @@ class GeneradorPuntajeEscala(Generador):
                 text-align: justify;
                 margin: 10px 0 10px 0;
             }
+            .firma-img {
+                width: 200px;
+                height: auto;
+                display: block;
+                margin: auto;
+            }
+            .box-firma {
+                width: 250px;
+                margin: auto;
+            }
+            .box-firma p {
+                text-align: center;
+            }
         </style>
         """
 
     def _generar_parrafo1(self) -> str:
         persona = self.resultado.persona
         nombre_completo = persona.nombre_completo
-        run = persona.rut
+        run = rut_chile.format_rut_with_dots(persona.rut)
         nacionalidad = persona.nacionalidad
 
         tramo_general = self.resultado.evaluacion["puntajes"]["General"]["nivel"]
@@ -211,7 +239,7 @@ class GeneradorPuntajeEscala(Generador):
         else:
             apto_no_apto = "no apto"
 
-        labor = "TODO: crear pregunta en surveymonkey"
+        labor = "&lt;TODO: crear pregunta en surveymonkey&gt;"
 
         return (
             "El profesional que firma este documento certifica que el Sr(a) "

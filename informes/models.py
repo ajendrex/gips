@@ -98,9 +98,9 @@ class Resultado(models.Model):
     metadata = models.JSONField()
     evaluacion = models.JSONField(null=True)
     informe = models.FileField(upload_to='informes/%Y/%m/%d/', null=True)
+    clave_archivo = models.CharField(max_length=20, null=True, blank=True)
     clave_acceso = models.CharField(max_length=255, unique=True, null=True)
     email_envio = models.EmailField(null=True, blank=True)
-    uuid4 = models.UUIDField(null=True, blank=True, unique=True)
 
     class Meta:
         unique_together = ('prueba', 'id_plataforma')

@@ -670,6 +670,17 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "rut-chile"
+version = "2.0.1"
+description = "Package for validating Chilean RUT"
+optional = false
+python-versions = "*"
+files = [
+    {file = "rut_chile-2.0.1-py3-none-any.whl", hash = "sha256:c39ced8e4e6c6c356008e5d88e7920b1c0b185267d7a657e3b53d2163a926ac9"},
+    {file = "rut_chile-2.0.1.tar.gz", hash = "sha256:2e4210dc18c3fe85121d6840bdcf87519d1234241f58770e84b34e33a9b2cd3b"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -876,4 +887,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "af2cb67f0ec57f6e913cb61e75034a8e3dfe7f49ab24d3cabe89398e5cb46796"
+content-hash = "c1243a96ca64ed721993f9221bd67a971e87e0b4b36e0ceae3d8f8f21d8df2f7"

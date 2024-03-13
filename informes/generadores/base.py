@@ -1,3 +1,5 @@
+import random
+import string
 from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import uuid4
@@ -42,11 +44,11 @@ class Generador(ABC, GIPSService):
             self._add_error_message(f"Error al generar informe: {e}")
             return
 
-        self.resultado.uuid4 = uuid4()
+        self.resultado.clave_archivo, self.resultado.clave_acceso = self._generar_codigos()
 
         informe = self._generar_informe()
         informe_file = ContentFile(informe)
-        django_file = File(informe_file, name=f"{self.resultado.uuid4}.pdf")
+        django_file = File(informe_file, name=f"{self.resultado.clave_archivo}.pdf")
 
         self.resultado.informe = django_file
         self.resultado.save()
@@ -60,6 +62,17 @@ class Generador(ABC, GIPSService):
         else:
             self.resultado.save()
             self._add_success_message("Resultado evaluado")
+
+    @staticmethod
+    def _generar_codigos(longitud_alfanumerico=12, longitud_numerico=5):
+        # Generar código alfanumérico
+        caracteres_alfanumericos = string.ascii_letters + string.digits
+        codigo_alfanumerico = ''.join(random.choice(caracteres_alfanumericos) for _ in range(longitud_alfanumerico))
+
+        # Generar código numérico
+        codigo_numerico = ''.join(random.choice(string.digits) for _ in range(longitud_numerico))
+
+        return codigo_alfanumerico, codigo_numerico
 
     def puede_generar_informe(self, raise_exception: bool = False) -> bool:
         try:
