@@ -1,5 +1,8 @@
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.static import serve
 
 from informes.models import Resultado
 
@@ -30,3 +33,13 @@ def verificar(request, clave_archivo):
             return render(request, "informes/error_verificacion.html")
 
     return render(request, "informes/verificar.html")
+
+
+@login_required
+def serve_protected_media(request, path):
+    """
+    Sirve los archivos de media con protección basada en autenticación.
+    """
+    print("hola!!!")
+    document_root = settings.MEDIA_ROOT
+    return serve(request, path, document_root=document_root)
