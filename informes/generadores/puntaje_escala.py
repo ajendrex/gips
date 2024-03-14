@@ -1,6 +1,11 @@
+import base64
+from io import BytesIO
+
+import qrcode
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from qrcode.image.pil import PilImage
 from rut_chile import rut_chile
 from weasyprint import HTML
 
@@ -160,13 +165,17 @@ class GeneradorPuntajeEscala(Generador):
 
         return evaluacion
 
-    def _generar_informe(self) -> bytes:
+    def _generar_informe(self, qr_image: PilImage) -> bytes:
         p1 = self._generar_parrafo1()
         p2 = self._generar_parrafo2()
         p3 = self._generar_parrafo3()
         texto_no_planificada = self.resultado.evaluacion["puntajes"]["No Planificada"]["texto"]
         texto_atencional = self.resultado.evaluacion["puntajes"]["Cognitiva"]["texto"]
         texto_motora = self.resultado.evaluacion["puntajes"]["Motora"]["texto"]
+
+        output = BytesIO()
+        qr_image.save(output, format="PNG")
+        qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
 
         html = f"""
         <html>
@@ -187,6 +196,7 @@ class GeneradorPuntajeEscala(Generador):
               <hr>
               <p>Pablo Ruiz Urbina<br>Psicólogo<br><span>N° Reg: 123851</span></p>
             </div>
+            <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
           </body>
         </html>
         """

@@ -121,6 +121,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 MEDIA_ROOT = os.getenv("MEDIA_ROOT", BASE_DIR / "media")
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -146,4 +147,5 @@ LOGGING = {
 
 
 # Custom settings
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 SURVEY_MONKEY_API_KEY = os.getenv("SURVEY_MONKEY_API_KEY")

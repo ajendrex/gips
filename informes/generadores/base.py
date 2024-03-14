@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import uuid4
 
+import qrcode
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -46,12 +48,26 @@ class Generador(ABC, GIPSService):
 
         self.resultado.clave_archivo, self.resultado.clave_acceso = self._generar_codigos()
 
-        informe = self._generar_informe()
+        qr_image = self._generar_qr(self.resultado.clave_acceso)
+
+        informe = self._generar_informe(qr_image)
         informe_file = ContentFile(informe)
         django_file = File(informe_file, name=f"{self.resultado.clave_archivo}.pdf")
 
         self.resultado.informe = django_file
         self.resultado.save()
+
+    @staticmethod
+    def _generar_qr(clave_archivo: str) -> bytes:
+        url = f"{settings.BASE_URL}/informes/verificar/{clave_archivo}"
+        # Generar el código QR
+        return qrcode.make(
+            url,
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=5,
+            border=2,
+        )
 
     def evaluar(self):
         try:
@@ -94,7 +110,7 @@ class Generador(ABC, GIPSService):
         ...
 
     @abstractmethod
-    def _generar_informe(self) -> bytes:
+    def _generar_informe(self, qr_image: bytes) -> bytes:
         ...
 
 
