@@ -48,7 +48,7 @@ class Generador(ABC, GIPSService):
 
         self.resultado.clave_archivo, self.resultado.clave_acceso = self._generar_codigos()
 
-        qr_image = self._generar_qr(self.resultado.clave_acceso)
+        qr_image = self._generar_qr(self.resultado.clave_archivo)
 
         informe = self._generar_informe(qr_image)
         informe_file = ContentFile(informe)

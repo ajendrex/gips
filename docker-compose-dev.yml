@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+    db:
+        volumes:
+            - ./data:/var/lib/postgresql/data
+
+    backend:
+          ports:
+                - 8000:8000
+          volumes:
+              - .:/app
+
+    proxy:
+        volumes:
+          - ./conf/nginx-dev.conf:/etc/nginx/nginx.conf

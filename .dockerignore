@@ -1,0 +1,4 @@
+Dockerfile
+db.sqlite3
+media
+parametros_prueba.json

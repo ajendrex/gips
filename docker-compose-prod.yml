@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+    db:
+        networks:
+            - app_net
+
+    proxy:
+        volumes:
+            - ./conf/certbot/conf:/etc/letsencrypt
+            - ./conf/certbot/www:/var/www/certbot
+            - ./proxy/dummy-certs/:/dummy-certs/
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+        networks:
+            - app_net
+
+    certbot:
+        image: certbot/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+        volumes:
+            - ./conf/certbot/conf:/etc/letsencrypt
+            - ./conf/certbot/www:/var/www/certbot
+        networks:
+            - app_net
+
+    static:
+        networks:
+            - app_net
+
+    backend:
+        networks:
+            - app_net
+        volumes:
+           - ./shared:/app/shared
+
+
+networks:
+    app_net:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+              - subnet: 172.21.0.0/24
+                gateway: 172.21.0.1

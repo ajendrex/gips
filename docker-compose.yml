@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+    db:
+        image: postgres:16.2
+        restart: always
+        environment:
+            - POSTGRES_PASSWORD
+            - POSTGRES_USER=gips
+        volumes:
+            - /db:/var/lib/postgresql/data
+            - ./shared:/shared
+
+    backend:
+        build:
+            context: .
+            args:
+                - SECRET_KEY
+        restart: always
+        environment:
+            - DATABASE_HOST
+            - DATABASE_URL
+            - SECRET_KEY
+
+    static:
+        build:
+            context: .
+        restart: always
+        command: ./run_lighttpd.sh
+
+    proxy:
+        image: nginx:latest
+        restart: always
+        volumes:
+            - ./conf/nginx.conf:/etc/nginx/nginx.conf
+        ports:
+            - "80:80"
+            - "443:443"

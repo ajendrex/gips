@@ -15,6 +15,8 @@ beautifulsoup4 = "^4.12.3"
 weasyprint = "^61.2"
 rut-chile = "^2.0.1"
 qrcode = {extras = ["pil"], version = "^7.4.2"}
+gunicorn = "^21.2.0"
+dj-database-url = "^2.1.0"
 
 
 [build-system]
