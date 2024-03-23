@@ -457,6 +457,20 @@ files = [
 django = ">=3.2"
 
 [[package]]
+name = "djangorestframework"
+version = "3.15.1"
+description = "Web APIs for Django, made easy."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "djangorestframework-3.15.1-py3-none-any.whl", hash = "sha256:3ccc0475bce968608cf30d07fb17d8e52d1d7fc8bfe779c905463200750cbca6"},
+    {file = "djangorestframework-3.15.1.tar.gz", hash = "sha256:f88fad74183dfc7144b2756d0d2ac716ea5b4c7c9840995ac3bfd8ec034333c1"},
+]
+
+[package.dependencies]
+django = ">=3.0"
+
+[[package]]
 name = "fonttools"
 version = "4.49.0"
 description = "Tools to manipulate font files"
@@ -1000,4 +1014,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "3a5168d814918ce1f1a60a25f810c26614d4d17ee251ed6ec424f08955d62bb4"
+content-hash = "3371769625f7fa1f551df081bc7eac922aaeed991f6f5f8f334ab8e7ad3f37eb"
