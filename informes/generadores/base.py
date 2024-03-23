@@ -13,6 +13,7 @@ from django.http import HttpRequest
 
 from informes.gips_service import GIPSService
 from informes.models import Resultado
+from utils.text import alfanumerico_random, numerico_random
 
 
 class Generador(ABC, GIPSService):
@@ -80,13 +81,12 @@ class Generador(ABC, GIPSService):
             self._add_success_message("Resultado evaluado")
 
     @staticmethod
-    def _generar_codigos(longitud_alfanumerico=12, longitud_numerico=5):
+    def _generar_codigos(longitud_alfanumerico: int = 12, longitud_numerico: int = 5):
         # Generar código alfanumérico
-        caracteres_alfanumericos = string.ascii_letters + string.digits
-        codigo_alfanumerico = ''.join(random.choice(caracteres_alfanumericos) for _ in range(longitud_alfanumerico))
+        codigo_alfanumerico = alfanumerico_random(longitud_alfanumerico)
 
         # Generar código numérico
-        codigo_numerico = ''.join(random.choice(string.digits) for _ in range(longitud_numerico))
+        codigo_numerico = numerico_random(longitud_numerico)
 
         return codigo_alfanumerico, codigo_numerico
 
