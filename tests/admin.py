@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from tests.models import Persona, Test, PreguntaLikertNOAS
+from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona
 
 
 @admin.register(Persona)
@@ -24,3 +24,18 @@ class TestAdmin(admin.ModelAdmin):
     date_hierarchy = 'fecha_creacion'
     ordering = ('-id',)
     inlines = [PreguntaLikertNOASInline]
+
+
+class AccesoTestPersonaInline(admin.TabularInline):
+    model = AccesoTestPersona
+    extra = 0
+    readonly_fields = ('codigo',)
+
+
+@admin.register(AccesoTest)
+class AccesoTestAdmin(admin.ModelAdmin):
+    list_display = ('test', 'fecha_creacion', 'fecha_vencimiento', 'mandante', 'valor_unitario')
+    search_fields = ('test__nombre', 'mandante__nombres', 'mandante__apellido_paterno', 'mandante__apellido_materno')
+    date_hierarchy = 'fecha_creacion'
+    list_filter = ('test', 'mandante__es_natural')
+    inlines = [AccesoTestPersonaInline]

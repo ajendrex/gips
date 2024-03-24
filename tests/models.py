@@ -2,7 +2,7 @@ import reversion
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_countries.fields import CountryField
-from chile_rut import validate_rut
+from rut_chile import rut_chile
 
 from utils.text import alfanumerico_random
 
@@ -15,7 +15,7 @@ class RUTField(models.CharField):
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
-        if not validate_rut(value):
+        if not rut_chile.is_valid_rut(value):
             raise ValidationError("RUT inválido")
 
 
@@ -86,9 +86,10 @@ class AccesoTest(models.Model):
     fecha_creacion = models.DateTimeField("fecha de creación", auto_now_add=True)
     fecha_vencimiento = models.DateTimeField("fecha de vencimiento")
     mandante = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name="accesos_mandante")
+    valor_unitario = models.IntegerField(default=12000)
 
     def __str__(self):
-        return f"{self.persona} - {self.test} - {self.fecha_creacion}"
+        return f"{self.test} - {self.mandante} - {self.fecha_creacion.date()} - {self.fecha_vencimiento.date()}"
 
 
 class AccesoTestPersona(models.Model):
@@ -100,7 +101,7 @@ class AccesoTestPersona(models.Model):
         unique_together = ("acceso_test", "persona")
 
     def save(self, *args, **kwargs):
-        self.codigo = alfanumerico_random(20)
+        self.codigo = self.codigo or alfanumerico_random(20)
         super().save(*args, **kwargs)
 
 
