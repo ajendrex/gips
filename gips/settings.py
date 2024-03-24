@@ -126,7 +126,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = "/static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "frontend/build/static",
+    BASE_DIR / "frontend/tests/build/static",
 ]
 
 MEDIA_ROOT = os.getenv("MEDIA_ROOT", BASE_DIR / "media")

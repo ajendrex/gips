@@ -7,7 +7,7 @@ import os
 class FrontendAppView(View):
     def get(self, request):
         try:
-            with open(settings.BASE_DIR / 'frontend/build/index.html') as f:
+            with open(settings.BASE_DIR / 'frontend/tests/build/index.html') as f:
                 return HttpResponse(f.read())
         except FileNotFoundError:
             return HttpResponse(
