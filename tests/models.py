@@ -1,3 +1,5 @@
+from typing import Dict
+
 import reversion
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -75,10 +77,10 @@ class PreguntaLikertNOAS(PreguntaBase):
             ("NO_PLANIFICADA", "No planificada"),
         )
     )
-    score_nunca = models.IntegerField("Nunca o casi nunca", default=1)
-    score_ocasionalmente = models.IntegerField("Ocasionalmente", default=2)
-    score_a_menudo = models.IntegerField("A menudo", default=3)
-    score_siempre = models.IntegerField("Siempre o casi siempre", default=4)
+    puntaje_nunca = models.IntegerField("Nunca o casi nunca", default=1)
+    puntaje_ocasionalmente = models.IntegerField("Ocasionalmente", default=2)
+    puntaje_a_menudo = models.IntegerField("A menudo", default=3)
+    puntaje_siempre = models.IntegerField("Siempre o casi siempre", default=4)
 
 
 class AccesoTest(models.Model):
@@ -106,16 +108,23 @@ class AccesoTestPersona(models.Model):
 
 
 class Resultado(models.Model):
-    acceso = models.ForeignKey(AccesoTest, on_delete=models.CASCADE, related_name="resultados")
-    persona = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name="resultados")
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="resultados")
+    acceso = models.OneToOneField(AccesoTestPersona, on_delete=models.CASCADE, related_name="resultados")
     fecha_creacion = models.DateTimeField("fecha de creación", auto_now_add=True)
 
-    class Meta:
-        unique_together = ("persona", "test")
-
     def __str__(self):
-        return f"{self.persona} - {self.test} - {self.fecha_creacion}"
+        return f"{self.persona} - {self.test} - {self.fecha_creacion.date()}"
+
+    @property
+    def persona(self) -> Persona:
+        return self.acceso.persona
+
+    @property
+    def test(self) -> Test:
+        return self.acceso.acceso_test.test
+
+    @property
+    def codigo_acceso(self) -> str:
+        return self.acceso.codigo
 
 
 class RespuestaBase(models.Model):
@@ -139,10 +148,27 @@ class RespuestaLikertNOAS(RespuestaBase):
             ("S", "Siempre o casi siempre"),
         ),
     )
-    score = models.IntegerField()
+    puntaje = models.IntegerField()
 
     class Meta:
         unique_together = ("resultado", "pregunta")
 
     def __str__(self):
         return f"{self.resultado} - {self.pregunta} - {self.alternativa}"
+
+    def save(self, *args, **kwargs):
+        self.puntaje = self.puntajes.get(self.alternativa)
+        super().save(*args, **kwargs)
+
+    @property
+    def puntajes(self) -> Dict[str, int]:
+        return {
+            "N": self.pregunta.puntaje_nunca,
+            "O": self.pregunta.puntaje_ocasionalmente,
+            "A": self.pregunta.puntaje_a_menudo,
+            "S": self.pregunta.puntaje_siempre,
+        }
+
+    @property
+    def categoria(self) -> str:
+        return self.pregunta.categoria

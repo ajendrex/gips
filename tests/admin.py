@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona
+from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
+    RespuestaLikertNOAS
 
 
 @admin.register(Persona)
@@ -39,3 +40,33 @@ class AccesoTestAdmin(admin.ModelAdmin):
     date_hierarchy = 'fecha_creacion'
     list_filter = ('test', 'mandante__es_natural')
     inlines = [AccesoTestPersonaInline]
+
+
+class RespuestaLikertNOASInline(admin.TabularInline):
+    model = RespuestaLikertNOAS
+    extra = 0
+    can_delete = False
+    fields = ('pregunta', 'categoria', 'alternativa', 'puntaje')
+    readonly_fields = ('pregunta', 'categoria', 'alternativa', 'puntaje')
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj):
+        return False
+
+
+@admin.register(Resultado)
+class ResultadoAdmin(admin.ModelAdmin):
+    list_display = ('persona', 'test', 'fecha_creacion')
+    search_fields = (
+        'acceso__persona__nombres',
+        'acceso__persona__apellido_paterno',
+        'acceso__persona__apellido_materno',
+        'acceso__persona__rut',
+    )
+    list_filter = ('acceso__acceso_test__test', 'acceso__persona__nacionalidad', 'acceso__persona__es_natural')
+    date_hierarchy = 'fecha_creacion'
+    fields = ('persona', 'test', 'fecha_creacion')
+    readonly_fields = ('persona', 'test', 'fecha_creacion')
+    inlines = [RespuestaLikertNOASInline]
