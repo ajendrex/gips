@@ -22,5 +22,6 @@ from informes.views import serve_protected_media
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("informes/", include("informes.urls")),
+    path("tests/", include("tests.urls")),
     re_path(r'^media/(?P<path>.*)$', serve_protected_media),
 ]
