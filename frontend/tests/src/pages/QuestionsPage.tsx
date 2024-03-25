@@ -2,8 +2,9 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useMutation, useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
 import axios from "axios";
-import {Prueba, RespuestaParams} from "./interfaces";
-import {getCsrfToken} from "./csrf";
+import {Prueba, RespuestaParams} from "../interfaces";
+import {getCsrfToken} from "../csrf";
+import {Button} from "@chakra-ui/react";
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     const resp = await axios.get(`/api/tests/tests/?codigo=${codigo}`)
@@ -100,9 +101,9 @@ const QuestionsPage: React.FC = () => {
                     <div key={pregunta.id} ref={el => preguntaRefs.current[index] = el} style={{marginBottom: "20px"}}>
                         <p>{pregunta.texto}</p>
                         {["Nunca", "Ocasionalmente", "A menudo", "Siempre"].map(respuesta => (
-                            <button key={respuesta} onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}>
+                            <Button key={respuesta} onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}>
                                 {respuesta}
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 ))
