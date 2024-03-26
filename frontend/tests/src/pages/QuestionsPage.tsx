@@ -97,21 +97,35 @@ const QuestionsPage: React.FC = () => {
             ) : error ? (
                 <div>Ocurrió un error al cargar las preguntas</div>
             ) : (
-                prueba?.preguntalikertnoas_set.map((pregunta, index) => (
-                    <div key={pregunta.id} ref={el => preguntaRefs.current[index] = el} style={{marginBottom: "20px"}}>
-                        <p>{pregunta.texto}</p>
-                        {["Nunca", "Ocasionalmente", "A menudo", "Siempre"].map(respuesta => (
-                            <Button
-                                key={respuesta}
-                                colorScheme={respuestas[pregunta.id] === respuesta[0] ? "blue" : "gray"}
-                                variant={respuestas[pregunta.id] === respuesta[0] ? "solid" : "outline"}
-                                onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}
-                            >
-                                {respuesta}
+                <>
+                {
+                    prueba?.preguntalikertnoas_set.map((pregunta, index) => (
+                        <div key={pregunta.id} ref={el => preguntaRefs.current[index] = el} style={{marginBottom: "20px"}}>
+                            <p>{pregunta.texto}</p>
+                            {["Nunca", "Ocasionalmente", "A menudo", "Siempre"].map(respuesta => (
+                                <Button
+                                    key={respuesta}
+                                    colorScheme={respuestas[pregunta.id] === respuesta[0] ? "blue" : "gray"}
+                                    variant={respuestas[pregunta.id] === respuesta[0] ? "solid" : "outline"}
+                                    onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}
+                                >
+                                    {respuesta}
+                                </Button>
+                            ))}
+                        </div>
+                    ))
+                }
+                {
+                    Object.keys(respuestas).length === prueba?.preguntalikertnoas_set.length && (
+                        <div>
+                            <p>¡Felicidades! Has completado todas las preguntas.</p>
+                            <Button colorScheme="teal" onClick={() => {/* Ir a la siguiente página */}}>
+                                Agendar Llamada
                             </Button>
-                        ))}
-                    </div>
-                ))
+                        </div>
+                    )
+                }
+                </>
             )}
         </div>
     )
