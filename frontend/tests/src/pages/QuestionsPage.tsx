@@ -4,7 +4,7 @@ import {useLocation} from 'react-router-dom'
 import axios from "axios";
 import {Prueba, RespuestaParams} from "../interfaces";
 import {getCsrfToken} from "../csrf";
-import {Button} from "@chakra-ui/react";
+import {Box, Button, FormControl, FormLabel, Switch} from "@chakra-ui/react";
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     const resp = await axios.get(`/api/tests/tests/?codigo=${codigo}`)
@@ -82,16 +82,14 @@ const QuestionsPage: React.FC = () => {
 
     return (
         <div style={{padding: "20px"}}>
-            <div style={{position: "fixed", bottom: "20px", right: "20px", zIndex: 1000}}>
-                <label>
-                    Auto-scroll
-                    <input
-                        type="checkbox"
-                        checked={autoScroll}
-                        onChange={() => setAutoScroll(!autoScroll)}
-                    />
-                </label>
-            </div>
+            <Box position="fixed" bottom="20px" right="20px" zIndex="1000">
+                <FormControl display="flex" alignItems="center">
+                    <FormLabel htmlFor="auto-scroll" mb="0" mr="2">
+                        Auto-scroll
+                    </FormLabel>
+                    <Switch id="auto-scroll" isChecked={autoScroll} onChange={() => setAutoScroll(!autoScroll)} />
+                </FormControl>
+            </Box>
             {isLoading ? (
                 <div>Cargando...</div>
             ) : error ? (
