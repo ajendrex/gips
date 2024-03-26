@@ -101,7 +101,12 @@ const QuestionsPage: React.FC = () => {
                     <div key={pregunta.id} ref={el => preguntaRefs.current[index] = el} style={{marginBottom: "20px"}}>
                         <p>{pregunta.texto}</p>
                         {["Nunca", "Ocasionalmente", "A menudo", "Siempre"].map(respuesta => (
-                            <Button key={respuesta} onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}>
+                            <Button
+                                key={respuesta}
+                                colorScheme={respuestas[pregunta.id] === respuesta[0] ? "blue" : "gray"}
+                                variant={respuestas[pregunta.id] === respuesta[0] ? "solid" : "outline"}
+                                onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}
+                            >
                                 {respuesta}
                             </Button>
                         ))}
