@@ -98,8 +98,17 @@ const QuestionsPage: React.FC = () => {
                     <>
                     {
                         prueba?.preguntalikertnoas_set.map((pregunta, index) => (
-                            <Box key={pregunta.id} ref={el => preguntaRefs.current[index] = el} padding="20px" mb="4" boxShadow="lg" borderRadius="md">
-                                <Text h={150} align="center">{pregunta.texto}</Text>
+                            <Box
+                                key={pregunta.id}
+                                ref={el => preguntaRefs.current[index] = el}
+                                padding="20px"
+                                mb="4"
+                                boxShadow="lg"
+                                borderRadius="md"
+                            >
+                                <Box h={150} display="flex" flexDirection="column" justifyContent="center">
+                                    <Text align="center" fontWeight="bold" fontFamily="'Roboto Slab', serif">{pregunta.texto}</Text>
+                                </Box>
                                 <RadioGroup onChange={(value) => handleAnswerSelect(pregunta.id, value)} value={respuestas[pregunta.id]}>
                                     <Stack direction="column">
                                         {[
