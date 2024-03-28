@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useMutation, useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
-import axios from "axios";
-import {Prueba, RespuestaParams} from "../interfaces";
-import {getCsrfToken} from "../csrf";
+import axios from "axios"
+import {Prueba, RespuestaParams} from "../interfaces"
+import {getCsrfToken} from "../csrf"
 import {Box, Button, FormControl, FormLabel, Radio, RadioGroup, Stack, Switch, Text} from "@chakra-ui/react"
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
