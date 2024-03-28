@@ -4,7 +4,7 @@ import {useLocation} from 'react-router-dom'
 import axios from "axios";
 import {Prueba, RespuestaParams} from "../interfaces";
 import {getCsrfToken} from "../csrf";
-import {Box, Button, FormControl, FormLabel, Switch} from "@chakra-ui/react";
+import {Box, Button, FormControl, FormLabel, Radio, RadioGroup, Stack, Switch, Text} from "@chakra-ui/react"
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     const resp = await axios.get(`/api/tests/tests/?codigo=${codigo}`)
@@ -14,7 +14,6 @@ const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     return resp.data
 }
 
-// Simula el envío de una respuesta a un endpoint
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
     const result = await axios.post(
         `/api/tests/respuestas_likert_noas/?codigo=${codigo}`,
@@ -81,50 +80,56 @@ const QuestionsPage: React.FC = () => {
     }, [preguntas?.length])
 
     return (
-        <div style={{padding: "20px"}}>
-            <Box position="fixed" bottom="20px" right="20px" zIndex="1000">
-                <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="auto-scroll" mb="0" mr="2">
-                        Auto-scroll
-                    </FormLabel>
-                    <Switch id="auto-scroll" isChecked={autoScroll} onChange={() => setAutoScroll(!autoScroll)} />
-                </FormControl>
-            </Box>
-            {isLoading ? (
-                <div>Cargando...</div>
-            ) : error ? (
-                <div>Ocurrió un error al cargar las preguntas</div>
-            ) : (
-                <>
-                {
-                    prueba?.preguntalikertnoas_set.map((pregunta, index) => (
-                        <div key={pregunta.id} ref={el => preguntaRefs.current[index] = el} style={{marginBottom: "20px"}}>
-                            <p>{pregunta.texto}</p>
-                            {["Nunca", "Ocasionalmente", "A menudo", "Siempre"].map(respuesta => (
-                                <Button
-                                    key={respuesta}
-                                    colorScheme={respuestas[pregunta.id] === respuesta[0] ? "blue" : "gray"}
-                                    variant={respuestas[pregunta.id] === respuesta[0] ? "solid" : "outline"}
-                                    onClick={() => handleAnswerSelect(pregunta.id, respuesta[0])}
-                                >
-                                    {respuesta}
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px"}}>
+            <Box width="100%" maxW="500px">
+                <Box position="fixed" bottom="20px" right="20px" zIndex="1000">
+                    <FormControl display="flex" alignItems="center">
+                        <FormLabel htmlFor="auto-scroll" mb="0" mr="2">
+                            Auto-scroll
+                        </FormLabel>
+                        <Switch id="auto-scroll" isChecked={autoScroll} onChange={() => setAutoScroll(!autoScroll)} />
+                    </FormControl>
+                </Box>
+                {isLoading ? (
+                    <div>Cargando...</div>
+                ) : error ? (
+                    <div>Ocurrió un error al cargar las preguntas</div>
+                ) : (
+                    <>
+                    {
+                        prueba?.preguntalikertnoas_set.map((pregunta, index) => (
+                            <Box key={pregunta.id} ref={el => preguntaRefs.current[index] = el} padding="20px" mb="4" boxShadow="lg" borderRadius="md">
+                                <Text h={150} align="center">{pregunta.texto}</Text>
+                                <RadioGroup onChange={(value) => handleAnswerSelect(pregunta.id, value)} value={respuestas[pregunta.id]}>
+                                    <Stack direction="column">
+                                        {[
+                                            {text: "Rara vez o nunca", code: "N"},
+                                            {text: "Ocasionalmente", code: "O"},
+                                            {text: "A menudo", code: "A"},
+                                            {text: "Siempre o casi siempre", code: "S"},
+                                        ].map(({text, code}) => (
+                                            <Radio key={code} value={code}>
+                                                {text}
+                                            </Radio>
+                                        ))}
+                                    </Stack>
+                                </RadioGroup>
+                            </Box>
+                        ))
+                    }
+                    {
+                        Object.keys(respuestas).length === prueba?.preguntalikertnoas_set.length && (
+                            <div>
+                                <p>¡Felicidades! Has completado todas las preguntas.</p>
+                                <Button colorScheme="teal" onClick={() => {/* Ir a la siguiente página */}}>
+                                    Agendar Llamada
                                 </Button>
-                            ))}
-                        </div>
-                    ))
-                }
-                {
-                    Object.keys(respuestas).length === prueba?.preguntalikertnoas_set.length && (
-                        <div>
-                            <p>¡Felicidades! Has completado todas las preguntas.</p>
-                            <Button colorScheme="teal" onClick={() => {/* Ir a la siguiente página */}}>
-                                Agendar Llamada
-                            </Button>
-                        </div>
-                    )
-                }
-                </>
-            )}
+                            </div>
+                        )
+                    }
+                    </>
+                )}
+            </Box>
         </div>
     )
 }
