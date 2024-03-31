@@ -35,7 +35,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,9 +45,11 @@ INSTALLED_APPS = [
     "django_countries",
     "reversion",
     "django_json_widget",
-    "informes",
     "tests",
+    "entrevistas",
+    "informes",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
