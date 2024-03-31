@@ -3,7 +3,7 @@ import {
   theme as chakraTheme,
 } from '@chakra-ui/react'
 
-const { Button, Switch, FormLabel, Radio } = chakraTheme.components
+const { Button, Switch, FormLabel, Radio, Heading, Card } = chakraTheme.components
 
 export const theme = extendBaseTheme({
   components: {
@@ -11,5 +11,7 @@ export const theme = extendBaseTheme({
     Switch,
     FormLabel,
     Radio,
+    Heading,
+    Card,
   },
 })
