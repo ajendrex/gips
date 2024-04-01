@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -75,3 +77,6 @@ class Bloqueo(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     motivo = models.TextField()
+
+
+TZ_CHILE = ZoneInfo("America/Santiago")

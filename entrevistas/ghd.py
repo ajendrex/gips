@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
+from django.utils.timezone import localtime
 
+from entrevistas.models import TZ_CHILE
 
 weekday_to_str = {
     0: "lunes",
@@ -24,6 +26,7 @@ class BloqueHorario:
 
     def fecha(self):
         return self.inicio.date()
+
 
 class Horario:
     def __init__(self, entrevistador: User):
@@ -58,15 +61,16 @@ class Horario:
                 # disp.inicio < bloqueo.inicio or disp.fin > bloqueo.fin     (C)
 
                 if disp.inicio < bloqueo.inicio:  # and we know disp.fin > bloqueo.inicio from (B)
-                    disp.fin = bloqueo.inicio
 
                     if disp.fin > bloqueo.fin:  # we should insert a new block
                         disponibilidad.insert(i_disp + 1, BloqueHorario(bloqueo.fin, disp.fin))
 
+                    disp.fin = bloqueo.inicio
+
                 else:  # we know disp.inicio < bloqueo.fin from (A) and bloqueo.fin < disp.fin from (C)
                     disp.inicio = bloqueo.fin
 
-                i_disp += 1
+        return disponibilidad
 
     def _get_disponibilidad_base(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[BloqueHorario]:
         fecha = fecha_inicio.date()
@@ -80,12 +84,12 @@ class Horario:
             )
 
             for disp in horarios_disponibles:
-                inicio = datetime(fecha.year, fecha.month, fecha.day, disp.inicio, disp.minuto_inicio)
+                inicio = datetime(fecha.year, fecha.month, fecha.day, disp.hora_inicio, disp.minuto_inicio, tzinfo=TZ_CHILE)
 
                 if inicio > fecha_fin:  # no more blocks to add
                     break
 
-                fin = datetime(fecha.year, fecha.month, fecha.day, disp.fin, disp.minuto_fin)
+                fin = datetime(fecha.year, fecha.month, fecha.day, disp.hora_fin, disp.minuto_fin, tzinfo=TZ_CHILE)
 
                 if fin > fecha_fin:
                     fin = fecha_fin
@@ -108,6 +112,6 @@ class Horario:
         )
 
         return [
-            BloqueHorario(bloqueo.fecha_inicio, bloqueo.fecha_fin)
+            BloqueHorario(localtime(bloqueo.fecha_inicio), localtime(bloqueo.fecha_fin))
             for bloqueo in bloqueos
         ]
