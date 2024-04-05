@@ -1,4 +1,5 @@
 import reversion
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -153,3 +154,11 @@ class Entrevista(models.Model):
 
     def __str__(self):
         return f"{self.resultado} - ({self.fecha})"
+
+
+class Sicologo(models.Model):
+    persona = models.OneToOneField(Persona, on_delete=models.RESTRICT, related_name='sicologo')
+    usuario = models.OneToOneField(User, on_delete=models.RESTRICT, related_name='sicologo')
+
+    def __str__(self):
+        return f"{self.persona} ({self.usuario})"
