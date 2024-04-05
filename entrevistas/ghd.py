@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
+from typing import Union
 
-from django.contrib.auth.models import User
 from django.utils.timezone import localtime
 
-from entrevistas.models import TZ_CHILE
+from entrevistas.models import TZ_CHILE, Entrevistador
 
 weekday_to_str = {
     0: "lunes",
@@ -14,6 +14,8 @@ weekday_to_str = {
     5: "sabado",
     6: "domingo",
 }
+
+MINUTOS_BLOQUE_ENTREVISTA = 30
 
 
 class BloqueHorario:
@@ -27,12 +29,20 @@ class BloqueHorario:
     def fecha(self):
         return self.inicio.date()
 
+    def to_dict(self) -> dict[str, datetime]:
+        return {
+            "inicio": self.inicio,
+            "fin": self.fin,
+        }
+
 
 class Horario:
-    def __init__(self, entrevistador: User):
+    def __init__(self, entrevistador: Entrevistador):
         self.entrevistador = entrevistador
 
     def generar_bloques_disponibles(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[BloqueHorario]:
+        fecha_inicio = localtime(fecha_inicio)
+        fecha_fin = localtime(fecha_fin)
         disponibilidad = self._get_disponibilidad_base(fecha_inicio, fecha_fin)
 
         if not disponibilidad:
@@ -86,15 +96,26 @@ class Horario:
             for disp in horarios_disponibles:
                 inicio = datetime(fecha.year, fecha.month, fecha.day, disp.hora_inicio, disp.minuto_inicio, tzinfo=TZ_CHILE)
 
-                if inicio > fecha_fin:  # no more blocks to add
+                if inicio >= fecha_fin:  # no more blocks to add
                     break
+
+                if inicio < fecha_inicio:
+                    inicio = fecha_inicio
 
                 fin = datetime(fecha.year, fecha.month, fecha.day, disp.hora_fin, disp.minuto_fin, tzinfo=TZ_CHILE)
 
                 if fin > fecha_fin:
                     fin = fecha_fin
 
-                disponibilidad.append(BloqueHorario(inicio, fin))
+                try:
+                    if disponibilidad[-1].fin >= inicio:
+                        disponibilidad[-1].fin = fin
+                        continue
+                except IndexError:
+                    pass
+
+                if (fin - inicio) >= timedelta(minutes=MINUTOS_BLOQUE_ENTREVISTA):
+                    disponibilidad.append(BloqueHorario(inicio, fin))
 
                 if fin == fecha_fin:  # no more blocks to add
                     break
@@ -115,3 +136,61 @@ class Horario:
             BloqueHorario(localtime(bloqueo.fecha_inicio), localtime(bloqueo.fecha_fin))
             for bloqueo in bloqueos
         ]
+
+
+class HorarioGlobal:
+    def __init__(self):
+        self.entrevistadores = Entrevistador.objects.filter(horarios_disponibles__isnull=False)
+
+    def generar_bloques_disponibles(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[BloqueHorario]:
+        horarios = self._generar_horarios(fecha_inicio, fecha_fin).values()
+
+        minutos = set()
+
+        for horario in horarios:
+            for bloque in horario:
+                minuto = bloque.inicio
+
+                while minuto <= bloque.fin:
+                    minutos.add(minuto)
+                    minuto += timedelta(minutes=1)
+
+        horario_global = []
+        minutos = list(sorted(minutos))
+        bloque = None
+
+        for min in minutos:
+            if bloque is None:
+                bloque = BloqueHorario(min, min)
+            elif min - bloque.fin == timedelta(minutes=1):
+                bloque.fin = min
+            else:
+                if bloque.fin - bloque.inicio >= timedelta(minutes=15):
+                    horario_global.append(bloque)
+                bloque = BloqueHorario(min, min)
+
+        if bloque.fin - bloque.inicio >= timedelta(minutes=15):
+            horario_global.append(bloque)
+
+        return horario_global
+
+    def obtener_entrevistadores(self, inicio: Union[datetime, str], fin: Union[datetime, str]) -> list[Entrevistador]:
+        if isinstance(inicio, str):
+            inicio = datetime.strptime(inicio, "%Y-%m-%d %H:%M").astimezone(TZ_CHILE)
+
+        if isinstance(fin, str):
+            fin = datetime.strptime(fin, "%Y-%m-%d %H:%M").astimezone(TZ_CHILE)
+
+        horarios_dict = self._generar_horarios(inicio, fin)
+
+        return [
+            entrevistador
+            for entrevistador, horarios in horarios_dict.items()
+            if len(horarios) == 1 and horarios[0].inicio == inicio and horarios[0].fin == fin
+        ]
+
+    def _generar_horarios(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[Entrevistador, list[BloqueHorario]]:
+        return {
+            entrevistador: Horario(entrevistador).generar_bloques_disponibles(fecha_inicio, fecha_fin)
+            for entrevistador in self.entrevistadores
+        }

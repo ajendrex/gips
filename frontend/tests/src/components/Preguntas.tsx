@@ -19,7 +19,7 @@ import {getCsrfToken} from "../csrf";
 
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
     const result = await axios.post(
-        `/api/tests/respuestas_likert_noas/?codigo=${codigo}`,
+        `/api/tests/respuestas-likert-noas/?codigo=${codigo}`,
         {
             pregunta: idPregunta,
             alternativa: respuesta,

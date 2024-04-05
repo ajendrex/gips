@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("informes/", include("informes.urls")),
     path("api/tests/", include("tests.urls")),
+    path("api/entrevistas/", include("entrevistas.urls")),
     re_path(r'^media/(?P<path>.*)$', serve_protected_media),
     re_path(r'^.*$', FrontendAppView.as_view(), name='home'),
 ]
