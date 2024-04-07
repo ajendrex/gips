@@ -160,9 +160,3 @@ LOGGING = {
 # Custom settings
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 SURVEY_MONKEY_API_KEY = os.getenv("SURVEY_MONKEY_API_KEY")
-
-# Patch for django-countries
-from django_countries.widgets import LazyChoicesMixin
-
-LazyChoicesMixin.get_choices = lambda self: self._choices
-LazyChoicesMixin.choices = property(LazyChoicesMixin.get_choices, LazyChoicesMixin.set_choices)
