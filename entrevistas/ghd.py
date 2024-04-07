@@ -132,10 +132,24 @@ class Horario:
             "fecha_inicio",
         )
 
-        return [
+        bloqueos_manuales = [
             BloqueHorario(localtime(bloqueo.fecha_inicio), localtime(bloqueo.fecha_fin))
             for bloqueo in bloqueos
         ]
+
+        entrevistas = self.entrevistador.entrevistas.filter(
+            fecha_inicio__lt=fecha_fin,
+            fecha_fin__gt=fecha_inicio,
+        ).order_by(
+            "fecha_inicio",
+        )
+
+        bloqueos_entrevistas = [
+            BloqueHorario(entrevista.fecha_inicio, entrevista.fecha_fin)
+            for entrevista in entrevistas
+        ]
+
+        return sorted(bloqueos_manuales + bloqueos_entrevistas, key=lambda bloqueo: bloqueo.inicio)
 
 
 class HorarioGlobal:

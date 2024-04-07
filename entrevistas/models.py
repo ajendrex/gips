@@ -28,7 +28,8 @@ class Entrevistador(models.Model):
 class Entrevista(models.Model):
     entrevistador = models.ForeignKey(Entrevistador, on_delete=models.RESTRICT, related_name="entrevistas")
     entrevistado = models.ForeignKey(Persona, on_delete=models.RESTRICT, related_name="entrevistas")
-    fecha = models.DateTimeField()
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

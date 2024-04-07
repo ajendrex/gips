@@ -3,9 +3,10 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from rest_framework.exceptions import AuthenticationFailed
 
-from entrevistas.ghd import HorarioGlobal
-from entrevistas.models import TZ_CHILE
+from entrevistas.ghd import HorarioGlobal, MINUTOS_BLOQUE_ENTREVISTA
+from entrevistas.models import TZ_CHILE, Entrevista
 from tests.models import AccesoTestPersona
+from utils.numbers import obtener_numero_aleatorio
 
 
 def _validate_request(request):
@@ -32,3 +33,12 @@ def crear_entrevista(request):
     data = request.POST
     inicio = datetime.strptime(data["fecha"], "%Y-%m-%d %H:%M")
     termino = inicio + timedelta(minutes=int(MINUTOS_BLOQUE_ENTREVISTA))
+
+    entrevistadores = HorarioGlobal().obtener_entrevistadores(inicio, termino)
+
+    if not entrevistadores:
+        return JsonResponse({"error": "No hay entrevistadores disponibles en ese horario"}, status=400)
+
+    entrevistador = entrevistadores[obtener_numero_aleatorio(0, len(entrevistadores) - 1)]
+
+    Entrevista.objects
