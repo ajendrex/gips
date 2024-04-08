@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: gunicorn gips.wsgi:application --log-file -
+  web: poetry run gunicorn gips.wsgi:application --log-file -
