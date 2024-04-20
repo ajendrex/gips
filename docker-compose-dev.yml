@@ -6,8 +6,6 @@ services:
             - ./data:/var/lib/postgresql/data
 
     backend:
-          ports:
-                - 8000:8000
           volumes:
               - .:/app
 

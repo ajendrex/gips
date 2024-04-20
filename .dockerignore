@@ -1,4 +1,13 @@
 Dockerfile
 db.sqlite3
 media
+data
 parametros_prueba.json
+/frontend/tests/node_modules
+.env
+.env_local
+.env_local_example
+.dockerignore
+docker-compose.yml
+docker-compose-dev.yml
+docker-compose-prod.yml

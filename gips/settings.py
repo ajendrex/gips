@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
-ALLOWED_HOSTS = ["elsicologico.cl", "elsicologo.cl"]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', "elsicologico.cl,elsicologo.cl").split(',')
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 

@@ -21,6 +21,8 @@ services:
             - DATABASE_HOST
             - DATABASE_URL
             - SECRET_KEY
+            - ALLOWED_HOSTS
+            - CSRF_TRUSTED_ORIGINS
 
     static:
         build:
