@@ -35,6 +35,36 @@ const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams)
     }
 }
 
+const findNextQuestion = (
+        preguntas: PreguntaLikertNOAS[],
+        respuestas: { [preguntaId: number]: string },
+        currentId: number,
+    ): number => {
+    let pastCurrent = false
+    let index = 0
+    let firstUnanswered = -1
+    let nextUnanswered = -1
+
+    for (const pregunta of preguntas) {
+        if (!respuestas[pregunta.id]) {
+            if (firstUnanswered === -1) {
+                firstUnanswered = index
+            }
+            if (pastCurrent) {
+                nextUnanswered = index
+                break
+            }
+        }
+        if (pregunta.id === currentId) {
+            pastCurrent = true
+        }
+
+        index++
+    }
+
+    return nextUnanswered !== -1 ? nextUnanswered : firstUnanswered
+}
+
 export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[], codigo: string}) => {
     const [autoScroll, setAutoScroll] = useState(true)
     const [respuestas, setRespuestas] = useState<{ [preguntaId: number]: string }>({})
@@ -61,7 +91,7 @@ export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[],
         // Calcula el índice de la pregunta basado en el scroll actual
         const indicePreguntaEnFoco = Math.floor(window.scrollY / alturaPorPregunta)
 
-        console.log(`h_total: ${alturaTotalDocumento}, viewPort: ${alturaViewport}, alturaPorPregunta: ${alturaPorPregunta}, maxScrolY: ${maxScrollY} scrollY: ${window.scrollY}, indicePregunta: ${indicePreguntaEnFoco}`)
+        console.debug(`h_total: ${alturaTotalDocumento}, viewPort: ${alturaViewport}, alturaPorPregunta: ${alturaPorPregunta}, maxScrolY: ${maxScrollY} scrollY: ${window.scrollY}, indicePregunta: ${indicePreguntaEnFoco}`)
 
         // Asegura que el índice está dentro de los límites del array de preguntas
         if (indicePreguntaEnFoco >= 0 && indicePreguntaEnFoco < (preguntas.length || 0)) {
@@ -85,9 +115,7 @@ export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[],
         mutation.mutate({codigo, idPregunta, respuesta})
 
         if (autoScroll) {
-            const siguientePreguntaIndex = preguntas.findIndex(
-                pregunta => !nuevasRespuestas[pregunta.id]
-            )
+            const siguientePreguntaIndex = findNextQuestion(preguntas, nuevasRespuestas, idPregunta)
             enfocarPregunta(siguientePreguntaIndex)
         }
     }
