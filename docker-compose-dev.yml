@@ -6,8 +6,9 @@ services:
             - ./data:/var/lib/postgresql/data
 
     backend:
-          volumes:
-              - .:/app
+        command: poetry run ./manage.py runserver
+        volumes:
+            - .:/app
 
     proxy:
         volumes:
