@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS
@@ -30,7 +31,13 @@ class TestAdmin(admin.ModelAdmin):
 class AccesoTestPersonaInline(admin.TabularInline):
     model = AccesoTestPersona
     extra = 0
-    readonly_fields = ('codigo',)
+    readonly_fields = ('codigo', 'url')
+
+    def url(self, obj):
+        return format_html('<a href="{}" target="blank"><img src="{}" style="width: 20px" alt="Visit"/></a>',
+                           f'/?codigo={obj.codigo}',
+                           '/static/admin/img/icon-viewlink.svg')
+    url.short_description = 'Acceder al test'
 
 
 @admin.register(AccesoTest)
