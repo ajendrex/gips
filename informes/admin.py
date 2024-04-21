@@ -10,8 +10,7 @@ from django_json_widget.widgets import JSONEditorWidget
 from reversion.admin import VersionAdmin
 
 from informes.generadores.base import get_generador
-from informes.models import Prueba, Pregunta, Alternativa, Categoria, Persona, Resultado, Respuesta, Entrevista, \
-    AlgoritmoEvaluacion
+from informes.models import Prueba, Pregunta, Alternativa, Resultado, Respuesta, Entrevista
 
 
 class PreguntaAdminMixin:
@@ -46,14 +45,12 @@ class PreguntaInlineForPrueba(PreguntaInline):
     formset = PreguntaInlineFormSet
 
 
-@admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion')
     search_fields = 'nombre',
     inlines = PreguntaInline,
 
 
-@admin.register(Prueba)
 class PruebaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
     readonly_fields = ('nombre', 'plataforma', 'fecha_creacion', 'fecha_actualizacion')
@@ -79,7 +76,6 @@ class AlternativaInline(admin.TabularInline):
         return False
 
 
-@admin.register(Pregunta)
 class PreguntaAdmin(admin.ModelAdmin, PreguntaAdminMixin):
     list_display = ('texto_formato_html', 'categoria', 'prueba', 'pagina', 'posicion', 'id_plataforma')
     list_editable = 'categoria',
@@ -107,7 +103,6 @@ class ResultadoInline(admin.TabularInline):
         return False
 
 
-@admin.register(Persona)
 class PersonaAdmin(VersionAdmin):
     list_display = 'rut', 'nombres', 'apellido_paterno', 'apellido_materno', 'email', 'nacionalidad', 'fecha_nacimiento'
     search_fields = 'rut', 'nombres', 'apellido_paterno', 'apellido_materno', 'email'
@@ -150,7 +145,6 @@ class EntrevistaInline(admin.StackedInline):
         return WithParentInstanceFormset
 
 
-@admin.register(Resultado)
 class ResultadoAdmin(admin.ModelAdmin):
     list_display = 'id', 'prueba', 'persona', 'fecha'
     search_fields = 'id', 'persona__rut', 'persona__nombres', 'persona__apellido_paterno'
@@ -235,7 +229,6 @@ class ResultadoAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(change_form_url)
 
 
-@admin.register(Respuesta)
 class RespuestaAdmin(admin.ModelAdmin):
     list_display = 'resultado', 'pregunta', 'valor'
     search_fields = 'resultado_id', 'pregunta__texto', 'alternativa__texto'
@@ -259,7 +252,6 @@ class PruebaInline(admin.TabularInline):
         return False
 
 
-@admin.register(AlgoritmoEvaluacion)
 class AlgoritmoEvaluacionAdmin(admin.ModelAdmin):
     list_display = 'nombre', 'clase'
     inlines = PruebaInline,
