@@ -40,6 +40,5 @@ def serve_protected_media(request, path):
     """
     Sirve los archivos de media con protección basada en autenticación.
     """
-    print("hola!!!")
     document_root = settings.MEDIA_ROOT
     return serve(request, path, document_root=document_root)
