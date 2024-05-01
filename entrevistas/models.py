@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from informes.models import Sicologo
-from tests.models import Persona
+from tests.models import Persona, AccesoTestPersona
 
 
 class Entrevistador(models.Model):
@@ -27,13 +27,21 @@ class Entrevistador(models.Model):
 
 class Entrevista(models.Model):
     entrevistador = models.ForeignKey(Entrevistador, on_delete=models.RESTRICT, related_name="entrevistas")
-    entrevistado = models.ForeignKey(Persona, on_delete=models.RESTRICT, related_name="entrevistas")
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    acceso = models.ForeignKey(AccesoTestPersona, on_delete=models.RESTRICT, related_name="entrevistas")
 
     def __str__(self):
         return f"{self.entrevistador} : {self.entrevistado} el {self.fecha}"
+
+    @property
+    def entrevistado(self):
+        return self.acceso.persona
+
+    @property
+    def fecha(self):
+        return self.fecha_inicio
 
 
 HORA_CHOICES = (
