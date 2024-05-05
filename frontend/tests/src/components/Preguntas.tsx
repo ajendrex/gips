@@ -2,6 +2,7 @@ import {PreguntaLikertNOAS, RespuestaParams} from "../interfaces";
 import React, {useEffect, useRef, useState} from "react";
 import {useMutation} from "react-query";
 import {
+    Alert, AlertDescription, AlertIcon, AlertTitle,
     Box,
     Button,
     Card,
@@ -9,29 +10,32 @@ import {
     FormLabel,
     Heading,
     Radio,
-    RadioGroup,
+    RadioGroup, Spinner,
     Stack,
     Switch,
-    Text
+    Text, useToast
 } from "@chakra-ui/react";
 import axios from "axios";
 import {getCsrfToken} from "../csrf";
+import {CheckIcon, WarningIcon} from "@chakra-ui/icons";
 
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
-    const result = await axios.post(
-        `/api/tests/respuestas-likert-noas/?codigo=${codigo}`,
-        {
-            pregunta: idPregunta,
-            alternativa: respuesta,
-        },
-        {
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
+    try {
+        await axios.post(
+            `/api/tests/respuestas-likert-noas/?codigo=${codigo}`,
+            {
+                pregunta: idPregunta,
+                alternativa: respuesta,
+            },
+            {
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                }
             }
-        }
-    )
-    if (result.status !== 201) {
-        throw new Error(`Error al enviar la respuesta: ${result.data}`)
+        )
+    } catch (error: any) {
+        const errorMsg = error.response.data[0] || error.response.data.detail || "Algo salió mal"
+        throw new Error(errorMsg)
     }
 }
 
@@ -65,17 +69,57 @@ const findNextQuestion = (
     return nextUnanswered !== -1 ? nextUnanswered : firstUnanswered
 }
 
-export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[], codigo: string}) => {
+interface PreguntasProps {
+    preguntas: PreguntaLikertNOAS[]
+    codigo: string
+    successCallback: () => void
+}
+
+export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) => {
     const [autoScroll, setAutoScroll] = useState(true)
     const [respuestas, setRespuestas] = useState<{ [preguntaId: number]: string }>({})
     const preguntaRefs = useRef<(HTMLDivElement | null)[]>([])
     const [preguntaEnFoco, setPreguntaEnFoco] = useState<number | null>(null)
+    const [respuestasPendientes, setRespuestasPendientes] = useState<number[]>([])
+    const [respuestasConError, setRespuestasConError] = useState<number[]>([])
+    const [reintentando, setReintentando] = useState(0)
 
-    const mutation = useMutation(({codigo, idPregunta, respuesta}: RespuestaParams) => submitRespuesta({
-        codigo,
-        idPregunta,
-        respuesta
-    }))
+    const mutation = useMutation(
+        ({codigo, idPregunta, respuesta}: RespuestaParams) => submitRespuesta({
+            codigo,
+            idPregunta,
+            respuesta
+        }),
+        {
+            onSuccess: (data, variables) => {
+                debugger
+                setRespuestasPendientes(respuestasPendientes.filter(id => id !== variables.idPregunta))
+                setRespuestasConError(respuestasConError.filter(id => id !== variables.idPregunta))
+            },
+            onError: (error, variables) => {
+                setRespuestasConError([...respuestasConError, variables.idPregunta])
+                setRespuestasPendientes(respuestasPendientes.filter(id => id !== variables.idPregunta))
+            },
+            retry: 3,
+            retryDelay: 1000,
+        }
+    )
+
+    const reintentarGuardarRespuestas = () => {
+        const respuestasAReintentar = Array.from(new Set(respuestasConError))
+        for (const idPregunta of respuestasAReintentar) {
+            setReintentando(r => r + 1)
+            setRespuestasPendientes([...respuestasPendientes, idPregunta])
+            mutation.mutate(
+                {codigo, idPregunta, respuesta: respuestas[idPregunta]},
+                {
+                    onSettled: () => {
+                        setReintentando(r => r - 1)
+                    }
+                }
+            )
+        }
+    }
 
     useEffect(() => {
         if (preguntaRefs.current[0]) {
@@ -112,6 +156,7 @@ export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[],
         const nuevasRespuestas = {...respuestas, [idPregunta]: respuesta}
         setRespuestas(nuevasRespuestas)
 
+        setRespuestasPendientes([...respuestasPendientes, idPregunta])
         mutation.mutate({codigo, idPregunta, respuesta})
 
         if (autoScroll) {
@@ -177,56 +222,93 @@ export const Preguntas = ({preguntas, codigo}: {preguntas: PreguntaLikertNOAS[],
                                 opacity={preguntaEnFoco === pregunta.id ? 1 : 0.5}
                             >{pregunta.texto}</Text>
                         </Box>
-                        <RadioGroup onChange={(value) => handleAnswerSelect(pregunta.id, value)} value={respuestas[pregunta.id]}>
-                            <Stack direction="column">
-                                {[
-                                    {text: "Rara vez o nunca", code: "N"},
-                                    {text: "Ocasionalmente", code: "O"},
-                                    {text: "A menudo", code: "A"},
-                                    {text: "Siempre o casi siempre", code: "S"},
-                                ].map(({text, code}) => (
-                                    <Radio
-                                        key={code}
-                                        value={code}
-                                        opacity={preguntaEnFoco === pregunta.id ? 1 : 0.5}
-                                    >
-                                        {text}
-                                    </Radio>
-                                ))}
-                            </Stack>
-                        </RadioGroup>
+                        <Box
+                            display="flex"
+                            flexDirection="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <RadioGroup
+                                onChange={(value) => handleAnswerSelect(pregunta.id, value)}
+                                value={respuestas[pregunta.id]}
+                            >
+                                <Stack direction="column">
+                                    {[
+                                        {text: "Rara vez o nunca", code: "N"},
+                                        {text: "Ocasionalmente", code: "O"},
+                                        {text: "A menudo", code: "A"},
+                                        {text: "Siempre o casi siempre", code: "S"},
+                                    ].map(({text, code}) => (
+                                        <Radio
+                                            key={code}
+                                            value={code}
+                                            opacity={preguntaEnFoco === pregunta.id ? 1 : 0.5}
+                                            isDisabled={respuestasPendientes.includes(pregunta.id)}
+                                        >
+                                            {text}
+                                        </Radio>
+                                    ))}
+                                </Stack>
+                            </RadioGroup>
+                            {!reintentando && respuestasPendientes.includes(pregunta.id) ? (
+                                <Spinner />
+                            ) : null}
+                        </Box>
                     </Box>
                 ))
             }
             <Box h={300}>
                 {
-                    Object.keys(respuestas).length === preguntas.length && (
-                        <Card p="10px">
-                            <Box
-                                display="flex"
-                                justifyContent="center"
-                                alignItems="center"
-                                flexDirection="column"
-                            >
-                                <Stack spacing="30px">
-                                    <Heading size="sm" mb="10px" mt="50px" textAlign="center">
-                                        ¡Perfecto!<br />
-                                    </Heading>
-                                    <Text lineHeight="25px">
-                                        Ahora debes agendar una entrevista con el psicólogo en el siguiente paso.
-                                    </Text>
-                                    <Box display="flex" justifyContent="center" mb="10px">
-                                        <Button
-                                            colorScheme="teal"
-                                            onClick={() => {/* Ir a la siguiente página */}}
-                                        >
-                                            Agendar Llamada
-                                        </Button>
-                                    </Box>
-                                </Stack>
-                            </Box>
-                        </Card>
-                    )
+                    Object.keys(respuestas).length === preguntas.length ? (
+                        respuestasConError.length || reintentando ? (
+                            <Stack spacing="30px" align="center">
+                                <Alert status="error">
+                                    <AlertIcon />
+                                    <AlertDescription>
+                                        Hubo problemas guardando algunas respuestas. Asegúrate de tener internet y luego
+                                        pincha el botón reintentar.
+                                    </AlertDescription>
+                                </Alert>
+                                { reintentando ? (
+                                    <Spinner />
+                                ) : (
+                                    <Button
+                                        width="50%"
+                                        onClick={reintentarGuardarRespuestas}
+                                        variant="solid"
+                                        colorScheme="green"
+                                    >
+                                        Reintentar
+                                    </Button>
+                                )}
+                            </Stack>
+                        ) : respuestasPendientes.length ? null : (
+                            <Card p="10px">
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    flexDirection="column"
+                                >
+                                    <Stack spacing="30px">
+                                        <Heading size="sm" mb="10px" mt="50px" textAlign="center">
+                                            ¡Perfecto!<br />
+                                        </Heading>
+                                        <Text lineHeight="25px">
+                                            Ahora debes agendar una entrevista con el psicólogo en el siguiente paso.
+                                        </Text>
+                                        <Box display="flex" justifyContent="center" mb="10px">
+                                            <Button
+                                                colorScheme="teal"
+                                                onClick={successCallback}
+                                            >
+                                                Agendar Llamada
+                                            </Button>
+                                        </Box>
+                                    </Stack>
+                                </Box>
+                            </Card>
+                    )) : null
                 }
             </Box>
         </>

@@ -16,6 +16,7 @@ weekday_to_str = {
 }
 
 MINUTOS_BLOQUE_ENTREVISTA = 30
+HORA_FMT = "%Y-%m-%d %H:%M"
 
 
 class BloqueHorario:
@@ -29,10 +30,10 @@ class BloqueHorario:
     def fecha(self):
         return self.inicio.date()
 
-    def to_dict(self) -> dict[str, datetime]:
+    def to_dict(self) -> dict[str, str]:
         return {
-            "inicio": self.inicio,
-            "fin": self.fin,
+            "inicio": self.inicio.strftime(HORA_FMT),
+            "fin": self.fin.strftime(HORA_FMT),
         }
 
 

@@ -1,39 +1,69 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
 import axios from "axios"
 import {Prueba} from "../interfaces"
-import {Box, Button, Card, Heading, Stack, Text} from "@chakra-ui/react"
+import {
+    Alert, AlertDescription,
+    AlertIcon,
+    AlertTitle,
+    Box,
+    Button,
+    Card,
+    Heading,
+    Spinner,
+    Stack,
+    Text,
+    useToast
+} from "@chakra-ui/react"
 import {Preguntas} from "../components/Preguntas";
+import Agenda from "../components/Agenda";
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
-    const resp = await axios.get(`/api/tests/tests/?codigo=${codigo}`)
-    if (resp.status !== 200) {
-        throw new Error(`Error al obtener las preguntas: ${resp.data}`)
+    try {
+        const resp = await axios.get(`/api/tests/tests/?codigo=${codigo}`)
+        return resp.data
+    } catch (error: any) {
+        const errorMsg = error.response.data[0] || error.response.data.detail || "Algo salió mal"
+        throw new Error(errorMsg)
     }
-    return resp.data
 }
 
 function useQueryParams() {
     return new URLSearchParams(useLocation().search)
 }
 
-const QuestionsPage: React.FC = () => {
+const TestPage: React.FC = () => {
     const queryParams = useQueryParams()
     const codigo = queryParams.get('codigo') || ''
     const [introAceptada, setIntroAceptada] = useState<boolean>(false)
+    const [preguntasRespondidas, setPreguntasRespondidas] = useState<boolean>(false)
 
-    const {data: prueba, isLoading, error} = useQuery(['fetchPrueba', codigo], () => fetchPrueba(codigo))
+    const {data: prueba, isLoading, error} = useQuery<Prueba, Error>(
+        ['fetchPrueba', codigo],
+        () => fetchPrueba(codigo),
+        {refetchOnWindowFocus: false}
+        )
+
+    const itemsAlignment = preguntasRespondidas ? "start" : "center"
 
     return (
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px"}}>
+        <div style={{display: "flex", justifyContent: "center", alignItems: itemsAlignment, minHeight: "100vh", padding: "20px"}}>
             <Box width="100%" maxW="500px">
                 {isLoading ? (
-                    <div>Cargando...</div>
+                    <Spinner speed="1s" />
                 ) : error ? (
-                    <div>Ocurrió un error al cargar las preguntas</div>
+                    <Alert status="error">
+                        <AlertIcon />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{error.message}</AlertDescription>
+                    </Alert>
+                ) : preguntasRespondidas ? (
+                    <Card p="10px">
+                        <Agenda codigo={codigo} />
+                    </Card>
                 ) : introAceptada ? (
-                    <Preguntas preguntas={prueba!.preguntalikertnoas_set} codigo={codigo} />
+                    <Preguntas preguntas={prueba!.preguntalikertnoas_set} codigo={codigo} successCallback={() => setPreguntasRespondidas(true)} />
                 ) : (
                     <Card p="10px">
                         <Stack spacing="15px">
@@ -55,4 +85,4 @@ const QuestionsPage: React.FC = () => {
     )
 }
 
-export default QuestionsPage
+export default TestPage

@@ -1,6 +1,6 @@
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import QuestionsPage from './pages/QuestionsPage'
+import TestPage from './pages/TestPage'
 import {QueryClientProvider} from "react-query"
 import {queryClient} from "./provisions/queryClient"
 import {ChakraBaseProvider} from "@chakra-ui/react";
@@ -13,7 +13,7 @@ const App: React.FC = () => {
                 <ChakraBaseProvider theme={theme}>
                     <Router>
                         <Routes>
-                            <Route path="/" element={<QuestionsPage/>}/>
+                            <Route path="/" element={<TestPage/>}/>
                         </Routes>
                     </Router>
                 </ChakraBaseProvider>
