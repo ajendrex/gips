@@ -1,8 +1,10 @@
-import {PreguntaLikertNOAS, RespuestaParams} from "../interfaces";
-import React, {useEffect, useRef, useState} from "react";
-import {useMutation} from "react-query";
+import {PreguntaLikertNOAS, RespuestaParams} from "../interfaces"
+import React, {useEffect, useRef, useState} from "react"
+import {useMutation} from "react-query"
 import {
-    Alert, AlertDescription, AlertIcon, AlertTitle,
+    Alert,
+    AlertDescription,
+    AlertIcon,
     Box,
     Button,
     Card,
@@ -13,11 +15,10 @@ import {
     RadioGroup, Spinner,
     Stack,
     Switch,
-    Text, useToast
-} from "@chakra-ui/react";
-import axios from "axios";
-import {getCsrfToken} from "../csrf";
-import {CheckIcon, WarningIcon} from "@chakra-ui/icons";
+    Text
+} from "@chakra-ui/react"
+import axios from "axios"
+import {getCsrfToken} from "../csrf"
 
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
     try {
@@ -92,7 +93,6 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
         }),
         {
             onSuccess: (data, variables) => {
-                debugger
                 setRespuestasPendientes(respuestasPendientes.filter(id => id !== variables.idPregunta))
                 setRespuestasConError(respuestasConError.filter(id => id !== variables.idPregunta))
             },

@@ -11,6 +11,7 @@ import {
 import axios from 'axios'
 import { getCsrfToken } from "../csrf";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import {useMutation} from "react-query";
 
 type Bloque = {
   inicio: string
@@ -26,11 +27,36 @@ const hora = (datetime: string): string => {
   return datetime.split(' ')[1]
 }
 
-const Agenda = ({codigo}: {codigo: string}) => {
+const Agenda = ({codigo, successCallback}: {codigo: string, successCallback: () => void}) => {
   const [availableDates, setAvailableDates] = useState<FechaDisponible[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedTime, setSelectedTime] = useState<Bloque | null>(null)
   const toast = useToast()
+  const agendarEntrevista = useMutation(
+    ({fecha}: {fecha: string}) => axios.post(
+      `/api/entrevistas/crear-entrevista/?codigo=${codigo}`,
+      { fecha: selectedTime?.inicio },
+      {
+        headers: {
+          'X-CSRFToken': getCsrfToken(),
+          'Content-Type': 'application/json',
+        },
+      }),
+      {
+        onSuccess: () => {
+          successCallback()
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error agendando entrevista",
+            description: error.toString(),
+            status: "error",
+            duration: 9000,
+            isClosable: true
+          })
+        }
+      }
+  )
 
   useEffect(() => {
     // scroll to top
@@ -64,23 +90,7 @@ const Agenda = ({codigo}: {codigo: string}) => {
   }
 
   const handleSubmit = () => {
-    axios.post(
-      `/api/entrevistas/crear-entrevista/?codigo=${codigo}`,
-      { fecha: selectedTime?.inicio },
-      {
-        headers: {
-          'X-CSRFToken': getCsrfToken(),
-          'Content-Type': 'application/json',
-        },
-      }).then(() => {
-        toast({
-          title: "Entrevista agendada!",
-          description: "Tu entrevista fue agendada exitosamente.",
-          status: "success",
-          duration: 5000,
-          isClosable: true
-        })
-      })
+    agendarEntrevista.mutate({fecha: selectedTime!.inicio})
   }
 
   const currentDay = availableDates[currentIndex]

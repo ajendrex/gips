@@ -9,7 +9,7 @@ import {
     AlertTitle,
     Box,
     Button,
-    Card,
+    Card, CloseButton,
     Heading,
     Spinner,
     Stack,
@@ -38,6 +38,7 @@ const TestPage: React.FC = () => {
     const codigo = queryParams.get('codigo') || ''
     const [introAceptada, setIntroAceptada] = useState<boolean>(false)
     const [preguntasRespondidas, setPreguntasRespondidas] = useState<boolean>(false)
+    const [entrevistaAgendada, setEntrevistaAgendada] = useState<boolean>(false)
 
     const {data: prueba, isLoading, error} = useQuery<Prueba, Error>(
         ['fetchPrueba', codigo],
@@ -58,9 +59,16 @@ const TestPage: React.FC = () => {
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>{error.message}</AlertDescription>
                     </Alert>
+                ) : entrevistaAgendada ? (
+                        <Card p="10px">
+                            <Alert status="success">
+                                <AlertDescription>La entrevista ha sido agendada con éxito.</AlertDescription>
+                                <CloseButton position="absolute" right="8px" top="8px" onClick={window.close}/>
+                            </Alert>
+                        </Card>
                 ) : preguntasRespondidas ? (
                     <Card p="10px">
-                        <Agenda codigo={codigo} />
+                        <Agenda codigo={codigo} successCallback={() => setEntrevistaAgendada(true)} />
                     </Card>
                 ) : introAceptada ? (
                     <Preguntas preguntas={prueba!.preguntalikertnoas_set} codigo={codigo} successCallback={() => setPreguntasRespondidas(true)} />

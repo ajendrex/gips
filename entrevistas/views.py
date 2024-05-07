@@ -92,11 +92,12 @@ def crear_entrevista(request):
 
     inicio = datetime.strptime(request.data["fecha"], HORA_FMT)
     inicio = make_aware(inicio, TZ_CHILE)
-    ahora = datetime.now(tz=TZ_CHILE)
 
-    if inicio < ahora + timedelta(hours=16):
+    ahora = datetime.now(tz=TZ_CHILE)
+    manhana = datetime(ahora.year, ahora.month, ahora.day, 10, tzinfo=TZ_CHILE) + timedelta(days=1)
+    if inicio < manhana:
         return JsonResponse(
-            {"error": "No puedes programar una entrevista para antes de 16 horas desde ahora"},
+            {"error": "Hora de inicio no puede ser antes de las 10:00 AM del día siguiente"},
             status=400,
         )
 
