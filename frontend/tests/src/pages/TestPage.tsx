@@ -39,6 +39,12 @@ const TestPage: React.FC = () => {
     const [introAceptada, setIntroAceptada] = useState<boolean>(false)
     const [preguntasRespondidas, setPreguntasRespondidas] = useState<boolean>(false)
     const [entrevistaAgendada, setEntrevistaAgendada] = useState<boolean>(false)
+    const [terminado, setTerminado] = useState<boolean>(false)
+
+    const terminar = () => {
+        window.close()
+        setTerminado(true)
+    }
 
     const {data: prueba, isLoading, error} = useQuery<Prueba, Error>(
         ['fetchPrueba', codigo],
@@ -59,11 +65,15 @@ const TestPage: React.FC = () => {
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>{error.message}</AlertDescription>
                     </Alert>
+                ) : terminado ? (
+                    <Card p="10px">
+                        <Text>Ya puedes cerrar tu navegador manualmente, nosotros lo intentamos pero no se pudo.</Text>
+                    </Card>
                 ) : entrevistaAgendada ? (
                         <Card p="10px">
                             <Alert status="success">
                                 <AlertDescription>La entrevista ha sido agendada con éxito.</AlertDescription>
-                                <CloseButton position="absolute" right="8px" top="8px" onClick={window.close}/>
+                                <CloseButton position="absolute" right="8px" top="8px" onClick={terminar}/>
                             </Alert>
                         </Card>
                 ) : preguntasRespondidas ? (
