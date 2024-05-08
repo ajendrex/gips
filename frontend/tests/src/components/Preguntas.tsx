@@ -81,6 +81,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
     const [respuestas, setRespuestas] = useState<{ [preguntaId: number]: string }>({})
     const preguntaRefs = useRef<(HTMLDivElement | null)[]>([])
     const [preguntaEnFoco, setPreguntaEnFoco] = useState<number | null>(null)
+    const [preguntaRespondida, setPreguntaRespondida] = useState<number | null>(null)
     const [respuestasPendientes, setRespuestasPendientes] = useState<number[]>([])
     const [respuestasConError, setRespuestasConError] = useState<number[]>([])
     const [reintentando, setReintentando] = useState(0)
@@ -154,15 +155,11 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
 
     const handleAnswerSelect = (idPregunta: number, respuesta: string) => {
         const nuevasRespuestas = {...respuestas, [idPregunta]: respuesta}
+        setPreguntaRespondida(idPregunta)
         setRespuestas(nuevasRespuestas)
 
         setRespuestasPendientes([...respuestasPendientes, idPregunta])
         mutation.mutate({codigo, idPregunta, respuesta})
-
-        if (autoScroll) {
-            const siguientePreguntaIndex = findNextQuestion(preguntas, nuevasRespuestas, idPregunta)
-            enfocarPregunta(siguientePreguntaIndex)
-        }
     }
 
     const enfocarPregunta = (index: number) => {
@@ -184,6 +181,13 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
             setPreguntaEnFoco(preguntas[index].id)
         }
     }
+
+    useEffect(() => {
+        if (autoScroll && preguntaRespondida !== null) {
+            const siguientePreguntaIndex = findNextQuestion(preguntas, respuestas, preguntaRespondida);
+            enfocarPregunta(siguientePreguntaIndex);
+        }
+    }, [respuestas, autoScroll, preguntaRespondida, preguntas, enfocarPregunta]);
 
     return (
         <>
