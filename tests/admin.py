@@ -18,6 +18,12 @@ class PreguntaLikertNOASInline(admin.TabularInline):
     model = PreguntaLikertNOAS
     extra = 0
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == 'texto':
+            field.widget.attrs['style'] = 'height: 20px;'
+        return field
+
 
 class TramoCategoriaEvaluacionInline(admin.TabularInline):
     model = TramoCategoriaEvaluacion
