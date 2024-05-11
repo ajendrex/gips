@@ -57,6 +57,32 @@ class Test(models.Model):
         return self.nombre
 
 
+class TramoCategoriaEvaluacion(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="tramos")
+    categoria = models.CharField(
+        "categoría",
+        max_length=100,
+        choices=(
+            ("GENERAL", "General"),
+            ("COGNITIVA", "Cognitiva"),
+            ("MOTORA", "Motora"),
+            ("NO_PLANIFICADA", "No planificada"),
+        ),
+    )
+    nombre = models.CharField(max_length=100)
+    texto = models.TextField("texto")
+    puntaje_minimo = models.IntegerField("puntaje mínimo")
+    puntaje_maximo = models.IntegerField("puntaje máximo")
+
+    class Meta:
+        unique_together = ("test", "categoria", "nombre")
+        verbose_name = "Tramo de categoría de evaluación"
+        verbose_name_plural = "Tramos de categorías de evaluación"
+
+    def __str__(self):
+        return f"{self.categoria} - {self.nombre}"
+
+
 class PreguntaBase(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     texto = models.TextField()
@@ -70,6 +96,7 @@ class PreguntaBase(models.Model):
 
 class PreguntaLikertNOAS(PreguntaBase):
     categoria = models.CharField(
+        "categoría",
         max_length=20,
         choices=(
             ("COGNITIVA", "Cognitiva"),

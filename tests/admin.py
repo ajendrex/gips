@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
-    RespuestaLikertNOAS
+    RespuestaLikertNOAS, TramoCategoriaEvaluacion
 
 
 @admin.register(Persona)
@@ -19,13 +19,18 @@ class PreguntaLikertNOASInline(admin.TabularInline):
     extra = 0
 
 
+class TramoCategoriaEvaluacionInline(admin.TabularInline):
+    model = TramoCategoriaEvaluacion
+    extra = 0
+
+
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'fecha_creacion', 'fecha_actualizacion')
     search_fields = ('nombre',)
     date_hierarchy = 'fecha_creacion'
     ordering = ('-id',)
-    inlines = [PreguntaLikertNOASInline]
+    inlines = [TramoCategoriaEvaluacionInline, PreguntaLikertNOASInline]
 
 
 class AccesoTestPersonaInline(admin.TabularInline):
