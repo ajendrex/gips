@@ -14,7 +14,17 @@ class PersonaAdmin(admin.ModelAdmin):
     ordering = ('-id',)
 
 
-class PreguntaLikertNOASInline(admin.TabularInline):
+class ShortTextoInlineMixin:
+    style_height = "20px"
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == 'texto':
+            field.widget.attrs['style'] = f'height: {self.style_height};'
+        return field
+
+
+class PreguntaLikertNOASInline(ShortTextoInlineMixin, admin.TabularInline):
     model = PreguntaLikertNOAS
     extra = 0
 
@@ -23,16 +33,11 @@ class PreguntaLikertNOASInline(admin.TabularInline):
             'all': ('css/admin_custom_inline.css',)
         }
 
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        field = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if db_field.name == 'texto':
-            field.widget.attrs['style'] = 'height: 20px;'
-        return field
 
-
-class TramoCategoriaEvaluacionInline(admin.TabularInline):
+class TramoCategoriaEvaluacionInline(ShortTextoInlineMixin, admin.TabularInline):
     model = TramoCategoriaEvaluacion
     extra = 0
+    style_height = "50px"
 
 
 @admin.register(Test)
