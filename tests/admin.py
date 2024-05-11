@@ -18,6 +18,11 @@ class PreguntaLikertNOASInline(admin.TabularInline):
     model = PreguntaLikertNOAS
     extra = 0
 
+    class Media:
+        css = {
+            'all': ('css/admin_custom_inline.css',)
+        }
+
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         field = super().formfield_for_dbfield(db_field, request, **kwargs)
         if db_field.name == 'texto':

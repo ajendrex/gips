@@ -1,0 +1,3 @@
+.inline-group .tabular td.original p {
+    display: none; /* Esto ocultará el título del inline que incluye la representación __str__ */
+}
