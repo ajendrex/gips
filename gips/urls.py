@@ -23,7 +23,7 @@ from gips.views import FrontendAppView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("informes/", include("informes.urls")),
-    path("verificar/", verificar, name="verificar"),
+    path(r'verificar/<str:clave_acceso>', verificar, name='verificar'),
     path("api/tests/", include("tests.urls")),
     path("api/entrevistas/", include("entrevistas.urls")),
     re_path(r'^media/(?P<path>.*)$', serve_protected_media),
