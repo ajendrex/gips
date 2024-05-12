@@ -1,0 +1,76 @@
+[
+{
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+        "name": "sicologos",
+        "permissions": [
+            [
+                "add_bloqueo",
+                "entrevistas",
+                "bloqueo"
+            ],
+            [
+                "change_bloqueo",
+                "entrevistas",
+                "bloqueo"
+            ],
+            [
+                "delete_bloqueo",
+                "entrevistas",
+                "bloqueo"
+            ],
+            [
+                "view_bloqueo",
+                "entrevistas",
+                "bloqueo"
+            ],
+            [
+                "add_disponibilidad",
+                "entrevistas",
+                "disponibilidad"
+            ],
+            [
+                "change_disponibilidad",
+                "entrevistas",
+                "disponibilidad"
+            ],
+            [
+                "delete_disponibilidad",
+                "entrevistas",
+                "disponibilidad"
+            ],
+            [
+                "view_disponibilidad",
+                "entrevistas",
+                "disponibilidad"
+            ],
+            [
+                "change_entrevista",
+                "entrevistas",
+                "entrevista"
+            ],
+            [
+                "view_entrevista",
+                "entrevistas",
+                "entrevista"
+            ],
+            [
+                "view_entrevistador",
+                "entrevistas",
+                "entrevistador"
+            ],
+            [
+                "view_respuestalikertnoas",
+                "tests",
+                "respuestalikertnoas"
+            ],
+            [
+                "view_resultado",
+                "tests",
+                "resultado"
+            ]
+        ]
+    }
+}
+]
