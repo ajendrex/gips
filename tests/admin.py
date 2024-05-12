@@ -95,6 +95,6 @@ class ResultadoAdmin(admin.ModelAdmin):
     )
     list_filter = ('acceso__acceso_test__test', 'acceso__persona__nacionalidad', 'acceso__persona__es_natural')
     date_hierarchy = 'fecha_creacion'
-    fields = ('persona', 'test', 'fecha_creacion')
+    fields = ('persona', 'test', 'fecha_creacion', 'informe')
     readonly_fields = ('persona', 'test', 'fecha_creacion')
     inlines = [RespuestaLikertNOASInline]

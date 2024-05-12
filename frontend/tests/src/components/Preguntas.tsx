@@ -201,7 +201,6 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
             </Box>
             <Box h={300} />
             {
-
                 preguntas.map((pregunta, index) => (
                     <Box
                         key={pregunta.id}

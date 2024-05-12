@@ -15,7 +15,7 @@ def verificar(request, clave_archivo):
         try:
             resultado = Resultado.objects.get(clave_archivo=clave_archivo, clave_acceso=clave_acceso)
         except Resultado.DoesNotExist:
-            return render(request, "informes/no_verificado.html", {"clave_archivo": clave_archivo})
+            return render(request, "entrevistas/no_verificado.html", {"clave_archivo": clave_archivo})
 
         # responder el contenido del informe
         try:
@@ -30,9 +30,9 @@ def verificar(request, clave_archivo):
                 return response
         except Exception as e:
             # Manejar el error o devolver una respuesta de error
-            return render(request, "informes/error_verificacion.html")
+            return render(request, "entrevistas/error_verificacion.html")
 
-    return render(request, "informes/verificar.html")
+    return render(request, "entrevistas/verificar.html")
 
 
 @login_required

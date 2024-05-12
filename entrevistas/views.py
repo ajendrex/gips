@@ -146,4 +146,5 @@ def _safe_crear_entrevista(entrevistador_id: int, inicio: datetime, termino: dat
             fecha_inicio=inicio,
             fecha_fin=termino,
             acceso=acceso,
+            resultado=acceso.resultado,
         )

@@ -16,10 +16,9 @@ class GIPSService:
         pass
 
     def _add_error_message(self, message: str):
+        logger.error(message, exc_info=True)
         if self.request:
             messages.error(self.request, message)
-        else:
-            logger.error(message)
 
     def _add_success_message(self, message: str):
         if self.request:

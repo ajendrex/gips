@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from informes.models import Sicologo
-from tests.models import Persona, AccesoTestPersona
+from tests.models import Persona, AccesoTestPersona, Resultado
 
 
 class Entrevistador(models.Model):
@@ -31,6 +31,8 @@ class Entrevista(models.Model):
     fecha_fin = models.DateTimeField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     acceso = models.ForeignKey(AccesoTestPersona, on_delete=models.RESTRICT, related_name="entrevistas")
+    resultado = models.OneToOneField(Resultado, on_delete=models.RESTRICT, related_name="entrevista", null=True)
+    observaciones = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.entrevistador} : {self.entrevistado} el {self.fecha}"

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 
 import reversion
 from django.core.exceptions import ValidationError
@@ -56,6 +56,10 @@ class Test(models.Model):
     def __str__(self):
         return self.nombre
 
+    @property
+    def categorias_tramos(self) -> Set[str]:
+        return set(self.tramos.values_list("categoria", flat=True).distinct())
+
 
 class TramoCategoriaEvaluacion(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="tramos")
@@ -69,7 +73,7 @@ class TramoCategoriaEvaluacion(models.Model):
             ("NO_PLANIFICADA", "No planificada"),
         ),
     )
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, choices=(("BAJO", "Bajo"), ("MODERADO", "Moderado"), ("ALTO", "Alto")))
     texto = models.TextField("texto")
     puntaje_minimo = models.IntegerField("puntaje mínimo")
     puntaje_maximo = models.IntegerField("puntaje máximo")
@@ -129,14 +133,20 @@ class AccesoTestPersona(models.Model):
     class Meta:
         unique_together = ("acceso_test", "persona")
 
+    def __str__(self):
+        return f"{self.persona} - {self.acceso_test} - {self.codigo}"
+
     def save(self, *args, **kwargs):
         self.codigo = self.codigo or alfanumerico_random(20)
         super().save(*args, **kwargs)
 
 
 class Resultado(models.Model):
-    acceso = models.OneToOneField(AccesoTestPersona, on_delete=models.CASCADE, related_name="resultados")
+    acceso = models.OneToOneField(AccesoTestPersona, on_delete=models.CASCADE, related_name="resultado")
     fecha_creacion = models.DateTimeField("fecha de creación", auto_now_add=True)
+    clave_archivo = models.CharField(max_length=20, blank=True, default="")
+    evaluacion = models.JSONField(default=dict)
+    informe = models.FileField(upload_to='resultados/%Y/%m/%d/', null=True)
 
     def __str__(self):
         return f"{self.persona} - {self.test} - {self.fecha_creacion.date()}"
