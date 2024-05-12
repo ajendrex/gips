@@ -78,7 +78,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
             telefono = telefono[1:]
 
         return format_html(
-            '<a href="https://wa.me/{}/?{}">Abrir mensaje</a>',
+            '<a href="https://wa.me/{}/?{}" target="blank">Abrir mensaje</a>',
             telefono,
             urlencode({
                 'text': f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
