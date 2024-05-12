@@ -136,13 +136,14 @@ class GeneradorPuntajeEscala(Generador):
                 </div>
                 <div class="column content-column">
                     <div>
-                        Para verificar la autenticidad escanee el código QR o visite<br>
+                        Para verificar la autenticidad<br>
+                        escanee el código QR o visite<br>
                         <a
                          href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
                          >
                             {domain}/verificar/{self.resultado.acceso.codigo}
                         </a><br>
-                        e ingrese el código de acceso <b>{self.resultado.clave_archivo}</b>
+                        e ingrese el código <b>{self.resultado.clave_archivo}</b>
                     </div>
                 </div>
             </div>
@@ -159,6 +160,10 @@ class GeneradorPuntajeEscala(Generador):
     def _estilos() -> str:
         return """
         <style>
+            @page {
+                size: A4; /* Change from the default size of A4 */
+                margin: 20mm; /* Set margin on each page */
+            }
             h1, h2 {
                 text-align: center;
             }
