@@ -21,6 +21,17 @@ class RUTField(models.CharField):
             raise ValidationError("RUT inválido")
 
 
+class Gentilicio(models.Model):
+    pais = CountryField(unique=True)
+    gentilicio = models.CharField(
+        max_length=100,
+        help_text='Gentilicio en género femenino, para ser usado después de "de nacionalidad". Ejemplo: "chilena"',
+    )
+
+    def __str__(self):
+        return f"{self.gentilicio} ({self.pais})"
+
+
 @reversion.register()
 class Persona(models.Model):
     rut = RUTField(unique=True)

@@ -9,6 +9,7 @@ from rut_chile import rut_chile
 from weasyprint import HTML
 
 from tests.generadores.base import Generador
+from tests.models import Gentilicio
 
 
 class GeneradorPuntajeEscala(Generador):
@@ -39,6 +40,11 @@ class GeneradorPuntajeEscala(Generador):
         self._validate()
 
         entrevista = getattr(self.resultado, 'entrevista', None)
+
+        nacion = self.resultado.persona.nacionalidad
+        if not Gentilicio.objects.filter(pais=nacion).exists():
+            pais = self.resultado.persona.get_nacionalidad_display()
+            raise ValidationError(f"No existe gentilicio para el país de la persona ({pais})")
 
         if not entrevista:
             raise ValidationError("Falta la entrevista")
@@ -164,7 +170,7 @@ class GeneradorPuntajeEscala(Generador):
         persona = self.resultado.persona
         nombre_completo = persona.nombre_completo
         run = rut_chile.format_rut_with_dots(persona.rut)
-        nacionalidad = persona.nacionalidad
+        nacionalidad = Gentilicio.objects.get(pais=persona.nacionalidad).gentilicio
 
         tramo_general = self.resultado.evaluacion["puntajes"]["GENERAL"]["nivel"]
 
@@ -175,7 +181,7 @@ class GeneradorPuntajeEscala(Generador):
         else:
             apto_no_apto = "no apto"
 
-        labor = "&lt;TODO: crear pregunta en surveymonkey&gt;"
+        labor = "&lt;POR HACER?&gt;"
 
         return (
             "El profesional que firma este documento certifica que el Sr(a) "
