@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -95,6 +97,30 @@ class ResultadoAdmin(admin.ModelAdmin):
     )
     list_filter = ('acceso__acceso_test__test', 'acceso__persona__nacionalidad', 'acceso__persona__es_natural')
     date_hierarchy = 'fecha_creacion'
-    fields = ('persona', 'test', 'fecha_creacion', 'informe')
-    readonly_fields = ('persona', 'test', 'fecha_creacion')
+    readonly_fields = ('persona', 'test', 'fecha_creacion', 'evaluacion_pretty')
     inlines = [RespuestaLikertNOASInline]
+    fieldsets = (
+        (None, {
+            'fields': (('persona', 'fecha_creacion'),)
+        }),
+        ('Evaluación', {
+            'fields': (('test', 'informe'), 'evaluacion_pretty',),
+        }),
+    )
+
+    def evaluacion_pretty(self, instance: Resultado) -> str:
+        if instance and instance.evaluacion:
+            return format_html(
+                "<pre>{}</pre>",
+                json.JSONEncoder(indent=2, sort_keys=True).encode(instance.evaluacion),
+            )
+        return ""
+    evaluacion_pretty.short_description = "Evaluación"
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        if not request.user.is_superuser:
+            queryset = queryset.filter(entrevista__entrevistador__usuario=request.user)
+
+        return queryset

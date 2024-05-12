@@ -57,6 +57,8 @@ class Generador(ABC, GIPSService):
         self.resultado.informe = django_file
         self.resultado.save()
 
+        self._add_success_message("Informe generado")
+
     @staticmethod
     def _generar_qr(codigo: str) -> bytes:
         url = f"{settings.BASE_URL}/informes/verificar/{codigo}"
@@ -109,7 +111,8 @@ class Generador(ABC, GIPSService):
         ...
 
 
-def get_generador(resultado: Optional[Resultado], request: Optional[HttpRequest]) -> Generador:
+def get_generador(resultado: Optional[Resultado], request: Optional[HttpRequest]) -> Optional[Generador]:
     from tests.generadores.puntaje_escala import GeneradorPuntajeEscala
 
-    return GeneradorPuntajeEscala(resultado, request)
+    if resultado:
+        return GeneradorPuntajeEscala(resultado, request)

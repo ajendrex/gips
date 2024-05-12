@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.html import format_html
 
+from entrevistas.forms import EntrevistaForm
 from entrevistas.models import Disponibilidad, Entrevistador, Bloqueo, Entrevista
 from tests.generadores.base import get_generador
 
@@ -57,12 +58,25 @@ class EntrevistaAdmin(admin.ModelAdmin):
         "acceso__persona__email",
     )
     date_hierarchy = "fecha_inicio"
-    change_form_template = "admin/entrevistas/entrevista/change_form.html"
-    exclude = ("resultado",)
+    form = EntrevistaForm
     readonly_fields = (
         "fecha_inicio",
         "fecha_fin",
-        "acceso",
+        "evaluacion_pretty",
+        "link_informe",
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    ("entrevistador_choice", "fecha_inicio", "fecha_fin"),
+                    "observaciones",
+                    ("resultado", "link_informe"),
+                    "evaluacion_pretty",
+                ),
+            },
+        ),
     )
 
     def email_entrevistado(self, obj):
@@ -84,14 +98,23 @@ class EntrevistaAdmin(admin.ModelAdmin):
 
         return read_only_fields
 
-    def evaluacion_pretty(self, instance) -> str:
-        if instance.evaluacion:
+    def evaluacion_pretty(self, instance: Entrevista) -> str:
+        if instance and instance.resultado and instance.resultado.evaluacion:
             return format_html(
                 "<pre>{}</pre>",
-                json.JSONEncoder(indent=2, sort_keys=True).encode(instance.evaluacion),
+                json.JSONEncoder(indent=2, sort_keys=True).encode(instance.resultado.evaluacion),
             )
         return ""
     evaluacion_pretty.short_description = "Evaluación"
+
+    def link_informe(self, instance: Entrevista) -> str:
+        if instance and instance.resultado and instance.resultado.informe:
+            return format_html(
+                '<a href="{}" target="_blank">Informe</a>',
+                instance.resultado.informe.url
+            )
+        return ""
+    link_informe.short_description = "Informe"
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -100,7 +123,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
         extra_context["puede_evaluar"] = False
         extra_context["puede_generar_informe"] = False
 
-        generador = get_generador(entrevista.resultado, request)
+        generador = get_generador(entrevista.resultado if entrevista else None, request)
 
         if generador:
             extra_context["puede_evaluar"] = generador.is_valid()

@@ -11,7 +11,7 @@ class Entrevistador(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.RESTRICT, related_name="entrevistador")
 
     def __str__(self):
-        return str(self.usuario)
+        return self.usuario.get_full_name()
 
     @property
     def first_name(self):
