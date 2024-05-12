@@ -1,5 +1,7 @@
 import json
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -59,13 +61,43 @@ class TestAdmin(admin.ModelAdmin):
 class AccesoTestPersonaInline(admin.TabularInline):
     model = AccesoTestPersona
     extra = 0
-    readonly_fields = ('codigo', 'url')
+    readonly_fields = ('codigo', 'url', 'link_whatsapp')
 
     def url(self, obj):
         return format_html('<a href="{}" target="blank"><img src="{}" style="width: 20px" alt="Visit"/></a>',
                            f'/?codigo={obj.codigo}',
                            '/static/admin/img/icon-viewlink.svg')
     url.short_description = 'Acceder al test'
+
+    def link_whatsapp(self, obj: AccesoTestPersona):
+        persona = obj.persona
+        empresa = obj.acceso_test.mandante
+        telefono = persona.telefono
+
+        if telefono.startswith('+'):
+            telefono = telefono[1:]
+
+        return format_html(
+            '<a href="https://wa.me/{}/?{}">Abrir mensaje</a>',
+            telefono,
+            urlencode({
+                'text': f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
+                'en evaluaciones psicológicas en linea.\n\n'
+                f'*{empresa}* nos solicitó evaluar tus impulsos para tu acreditación como '
+                f'personal de seguridad.\n\n'
+                'Te evaluaremos en 2 etapas:\n'
+                '-	En la primera contestarás un test online.\n'
+                '-	En la segunda tendrás una entrevista psicológica por video llamada de WhatsApp.\n\n'
+                'Si tienes dudas o algún problema, avísanos por este chat.\n\n'
+                'Cuando estés listo/a, toca el siguiente enlace para empezar el test:\n'
+                f'{settings.BASE_URL}/?codigo={obj.codigo}\n\n'
+                'Cuando lo termines, elige el día y la hora que te acomoden para realizar la entrevista.\n\n'
+                'Te Saluda,\n'
+                '*Equipo El sicológico*\n'
+                'www.elsicologico.cl',
+            }),
+        )
+    link_whatsapp.short_description = 'Presentación en Whatsapp'
 
 
 @admin.register(AccesoTest)
