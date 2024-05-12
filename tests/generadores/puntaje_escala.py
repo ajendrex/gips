@@ -190,6 +190,7 @@ class GeneradorPuntajeEscala(Generador):
             .verification {
                 display: flex;  /* Activa Flexbox */
                 width: 100%;    /* Establece el ancho del contenedor al 100% */
+                margin-top: -80px;
             }
             
             .column {
