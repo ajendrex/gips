@@ -171,5 +171,5 @@ LOGGING = {
 
 
 # Custom settings
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("BASE_URL", "https://elsicologico.cl")
 SURVEY_MONKEY_API_KEY = os.getenv("SURVEY_MONKEY_API_KEY")
