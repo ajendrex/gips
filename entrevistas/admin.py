@@ -118,18 +118,20 @@ class EntrevistaAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        entrevista: Entrevista = self.get_object(request, object_id)
 
-        extra_context["puede_evaluar"] = False
-        extra_context["puede_generar_informe"] = False
+        if request.method == "GET":
+            entrevista: Entrevista = self.get_object(request, object_id)
 
-        generador = get_generador(entrevista.resultado if entrevista else None, request)
+            extra_context["puede_evaluar"] = False
+            extra_context["puede_generar_informe"] = False
 
-        if generador:
-            extra_context["puede_evaluar"] = generador.is_valid()
+            generador = get_generador(entrevista.resultado if entrevista else None, request)
 
-            if extra_context["puede_evaluar"]:
-                extra_context["puede_generar_informe"] = generador.puede_generar_informe()
+            if generador:
+                extra_context["puede_evaluar"] = generador.is_valid()
+
+                if extra_context["puede_evaluar"]:
+                    extra_context["puede_generar_informe"] = generador.puede_generar_informe()
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
