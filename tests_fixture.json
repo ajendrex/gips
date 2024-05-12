@@ -1,0 +1,545 @@
+[
+{
+    "model": "tests.test",
+    "pk": 1,
+    "fields": {
+        "nombre": "Control de Impulsos",
+        "fecha_creacion": "2024-04-29T22:26:04.161Z",
+        "fecha_actualizacion": "2024-05-12T03:44:10.146Z"
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 1,
+    "fields": {
+        "test": 1,
+        "categoria": "GENERAL",
+        "nombre": "BAJO",
+        "texto": "Bajo nivel de impulsividad y alto de autocontrol.",
+        "puntaje_minimo": 0,
+        "puntaje_maximo": 49
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 2,
+    "fields": {
+        "test": 1,
+        "categoria": "GENERAL",
+        "nombre": "MODERADO",
+        "texto": "Niveles moderados o normales de impulsividad y autocontrol.",
+        "puntaje_minimo": 50,
+        "puntaje_maximo": 77
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 3,
+    "fields": {
+        "test": 1,
+        "categoria": "GENERAL",
+        "nombre": "ALTO",
+        "texto": "Alto nivel de impulsividad y bajo de autocontrol.",
+        "puntaje_minimo": 78,
+        "puntaje_maximo": 200
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 4,
+    "fields": {
+        "test": 1,
+        "categoria": "COGNITIVA",
+        "nombre": "BAJO",
+        "texto": "Tendencia a pensar antes de actuar, analizar las opciones y sus consecuencias antes de tomar decisiones.",
+        "puntaje_minimo": 0,
+        "puntaje_maximo": 17
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 5,
+    "fields": {
+        "test": 1,
+        "categoria": "COGNITIVA",
+        "nombre": "MODERADO",
+        "texto": "Tendencia a pensar antes de actuar, en raras ocaciones se deja llevar por la situación, deseos o sentimientos.",
+        "puntaje_minimo": 18,
+        "puntaje_maximo": 26
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 6,
+    "fields": {
+        "test": 1,
+        "categoria": "COGNITIVA",
+        "nombre": "ALTO",
+        "texto": "Tendencia a actuar sin pensar, a tomar decisiones rápidas sin tomar en cuenta las consecuencias.",
+        "puntaje_minimo": 27,
+        "puntaje_maximo": 200
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 7,
+    "fields": {
+        "test": 1,
+        "categoria": "MOTORA",
+        "nombre": "BAJO",
+        "texto": "Comportamiento cuidadoso o poco arriesgado, realiza actividades (deportes, viajes, trabajos) siguiendo protocolos o con elementos de protección correspondientes.",
+        "puntaje_minimo": 0,
+        "puntaje_maximo": 15
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 8,
+    "fields": {
+        "test": 1,
+        "categoria": "MOTORA",
+        "nombre": "MODERADO",
+        "texto": "Suele quedarse quieto(a), en silencio o ser paciente en situaciones de espera, aunque en ocaciones se deja llevar por sus impulsos.",
+        "puntaje_minimo": 16,
+        "puntaje_maximo": 22
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 9,
+    "fields": {
+        "test": 1,
+        "categoria": "MOTORA",
+        "nombre": "ALTO",
+        "texto": "Comportamiento cuidadoso o poco arriesgado, realiza actividades (deportes, viajes, trabajos) siguiendo protocolos o con elementos de protección correspondientes.",
+        "puntaje_minimo": 23,
+        "puntaje_maximo": 200
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 10,
+    "fields": {
+        "test": 1,
+        "categoria": "NO_PLANIFICADA",
+        "nombre": "BAJO",
+        "texto": "Prefiere actividades tranquilas y seguras, como leer en casa o ver películas, evita situaciones desconocidas o potencialmente peligrosas.",
+        "puntaje_minimo": 0,
+        "puntaje_maximo": 18
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 11,
+    "fields": {
+        "test": 1,
+        "categoria": "NO_PLANIFICADA",
+        "nombre": "MODERADO",
+        "texto": "A veces busca nuevas experiencias, como probar nuevos deportes o explorar lugares desconocidos, pero dentro de ciertos límites de seguridad.",
+        "puntaje_minimo": 19,
+        "puntaje_maximo": 28
+    }
+},
+{
+    "model": "tests.tramocategoriaevaluacion",
+    "pk": 12,
+    "fields": {
+        "test": 1,
+        "categoria": "NO_PLANIFICADA",
+        "nombre": "ALTO",
+        "texto": "Busca constantemente emociones nuevas y fuertes, se siente cómodo en situaciones de alto riesgo y disfruta de la adrenalina que proviene de experiencias intensas. incluso si eso implica correr riesgos o desafiar normas sociales.",
+        "puntaje_minimo": 29,
+        "puntaje_maximo": 200
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 1,
+    "fields": {
+        "test": 1,
+        "texto": "Planifico todo lo que hago",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 2,
+    "fields": {
+        "test": 1,
+        "texto": "Hago las cosas sin pensarlo mucho",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 3,
+    "fields": {
+        "test": 1,
+        "texto": "Me molesto fácilmente / me tomo las cosas muy en serio",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 4,
+    "fields": {
+        "test": 1,
+        "texto": "Me vienen pensamientos rápidos y sin control",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 5,
+    "fields": {
+        "test": 1,
+        "texto": "Planifico lo que haré con anticipación",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 1,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 6,
+    "fields": {
+        "test": 1,
+        "texto": "Tengo autocontrol",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 1,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 7,
+    "fields": {
+        "test": 1,
+        "texto": "Me concentro fácilmente",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 8,
+    "fields": {
+        "test": 1,
+        "texto": "Ahorro con regularidad",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 9,
+    "fields": {
+        "test": 1,
+        "texto": "Se me hace difícil estar quieto/a por mucho tiempo",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 10,
+    "fields": {
+        "test": 1,
+        "texto": "Me tomo mi tiempo para pensar las cosas",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 11,
+    "fields": {
+        "test": 1,
+        "texto": "Miro el semáforo o ambos lados de la calle antes de cruzar",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 12,
+    "fields": {
+        "test": 1,
+        "texto": "Digo las cosas sin pensar",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 13,
+    "fields": {
+        "test": 1,
+        "texto": "Me gusta pensar en problemas complicados",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 14,
+    "fields": {
+        "test": 1,
+        "texto": "Me gusta tener experiencias que suban mi adrenalina",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 15,
+    "fields": {
+        "test": 1,
+        "texto": "Actúo sin pensar",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 16,
+    "fields": {
+        "test": 1,
+        "texto": "Me aburre pensar en algo por mucho tiempo",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 17,
+    "fields": {
+        "test": 1,
+        "texto": "Me aseguro que tendré dinero para pagar mis gastos",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 18,
+    "fields": {
+        "test": 1,
+        "texto": "Hago las cosas en el momento en que se me ocurren",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 19,
+    "fields": {
+        "test": 1,
+        "texto": "Soy capaz de mantener la calma en situaciones estresantes",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 20,
+    "fields": {
+        "test": 1,
+        "texto": "Actúo según creo, más que seguir las instrucciones",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 21,
+    "fields": {
+        "test": 1,
+        "texto": "Compro cosas si pensarlo mucho",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 22,
+    "fields": {
+        "test": 1,
+        "texto": "Prefiero actividades tranquilas como ver películas, pasear en familia o caminar",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 23,
+    "fields": {
+        "test": 1,
+        "texto": "Soy capaz de pensar sin distraerme",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 4,
+        "puntaje_ocasionalmente": 3,
+        "puntaje_a_menudo": 2,
+        "puntaje_siempre": 1
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 24,
+    "fields": {
+        "test": 1,
+        "texto": "Resuelvo los problemas uno por uno",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 25,
+    "fields": {
+        "test": 1,
+        "texto": "Gasto en cosas que me gustan pero no necesito o no uso",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 26,
+    "fields": {
+        "test": 1,
+        "texto": "Me interesa más el presente que el futuro",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 27,
+    "fields": {
+        "test": 1,
+        "texto": "Soy una persona impaciente",
+        "categoria": "MOTORA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 28,
+    "fields": {
+        "test": 1,
+        "texto": "Me gusta viajar de forma espontanea a lugares que no conozco",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 29,
+    "fields": {
+        "test": 1,
+        "texto": "Me siento inquieto/a si tengo que escuchar hablar a alguien por mucho tiempo",
+        "categoria": "COGNITIVA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+},
+{
+    "model": "tests.preguntalikertnoas",
+    "pk": 30,
+    "fields": {
+        "test": 1,
+        "texto": "He perdido dinero en proyectos que me parecieron una buena idea",
+        "categoria": "NO_PLANIFICADA",
+        "puntaje_nunca": 1,
+        "puntaje_ocasionalmente": 2,
+        "puntaje_a_menudo": 3,
+        "puntaje_siempre": 4
+    }
+}
+]
