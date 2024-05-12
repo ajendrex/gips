@@ -204,7 +204,7 @@ class GeneradorPuntajeEscala(Generador):
                 flex-grow: 1;    /* Permite que esta columna crezca y ocupe el espacio restante */
                 align-content: end;  /* Alinea el contenido al final de la columna */
                 text-align: right;  /* Alinea el texto a la derecha */
-                padding-top: 97px;
+                padding-top: 90px;
                 overflow-wrap: break-word;  /* Asegura que las palabras largas se rompan para evitar desbordamiento */
                 word-wrap: break-word;      /* Asegura que las palabras largas se rompan para evitar desbordamiento */
                 overflow: hidden;           /* Oculta cualquier contenido que se desborde del contenedor */
