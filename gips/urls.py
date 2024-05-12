@@ -17,12 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 
+from entrevistas.views import serve_protected_media, verificar
 from gips.views import FrontendAppView
-from informes.views import serve_protected_media
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("informes/", include("informes.urls")),
+    path("verificar/", verificar, name="verificar"),
     path("api/tests/", include("tests.urls")),
     path("api/entrevistas/", include("entrevistas.urls")),
     re_path(r'^media/(?P<path>.*)$', serve_protected_media),

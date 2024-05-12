@@ -102,14 +102,14 @@ class ResultadoAdmin(admin.ModelAdmin):
     )
     list_filter = ('acceso__acceso_test__test', 'acceso__persona__nacionalidad', 'acceso__persona__es_natural')
     date_hierarchy = 'fecha_creacion'
-    readonly_fields = ('persona', 'test', 'fecha_creacion', 'evaluacion_pretty')
+    readonly_fields = ('persona', 'test', 'fecha_creacion', 'evaluacion_pretty', 'clave_archivo')
     inlines = [RespuestaLikertNOASInline]
     fieldsets = (
         (None, {
             'fields': (('persona', 'fecha_creacion'),)
         }),
         ('Evaluación', {
-            'fields': (('test', 'informe'), 'evaluacion_pretty',),
+            'fields': (('test', 'informe', 'clave_archivo'), 'evaluacion_pretty',),
         }),
     )
 

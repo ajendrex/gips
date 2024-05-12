@@ -109,6 +109,8 @@ class GeneradorPuntajeEscala(Generador):
         qr_image.save(output, format="PNG")
         qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
 
+        domain = settings.BASE_URL.replace("http://", "").replace("https://", "")
+
         html = f"""
         <html>
           <head>{self._estilos()}</head>
@@ -128,12 +130,29 @@ class GeneradorPuntajeEscala(Generador):
               <hr>
               <p>Pablo Ruiz Urbina<br>Psicólogo<br><span>N° Reg: 123851</span></p>
             </div>
-            <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
+            <div class="verification">
+                <div class="column image-column">
+                    <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
+                </div>
+                <div class="column content-column">
+                    <div>
+                        Para verificar la autenticidad escanee el código QR o visite<br>
+                        <a
+                         href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
+                         >
+                            {domain}/verificar/{self.resultado.acceso.codigo}
+                        </a><br>
+                        e ingrese el código de acceso <b>{self.resultado.clave_archivo}</b>
+                    </div>
+                </div>
+            </div>
           </body>
         </html>
         """
         soup = BeautifulSoup(html, "html.parser")
-        print(soup.prettify())
+        f = open("informe.html", "w")
+        f.write(soup.prettify())
+        f.close()
         return HTML(string=html, base_url=settings.BASE_DIR).write_pdf()
 
     @staticmethod
@@ -162,6 +181,28 @@ class GeneradorPuntajeEscala(Generador):
             }
             .box-firma p {
                 text-align: center;
+            }
+            .verification {
+                display: flex;  /* Activa Flexbox */
+                width: 100%;    /* Establece el ancho del contenedor al 100% */
+            }
+            
+            .column {
+                flex-shrink: 0; /* Evita que la columna se reduzca más pequeña que su contenido */
+            }
+            
+            .image-column {
+                flex-basis: auto; /* Tamaño basado en el contenido de la columna (la imagen) */
+            }
+            
+            .content-column {
+                flex-grow: 1;    /* Permite que esta columna crezca y ocupe el espacio restante */
+                align-content: end;  /* Alinea el contenido al final de la columna */
+                text-align: right;  /* Alinea el texto a la derecha */
+                padding-top: 110px;
+                overflow-wrap: break-word;  /* Asegura que las palabras largas se rompan para evitar desbordamiento */
+                word-wrap: break-word;      /* Asegura que las palabras largas se rompan para evitar desbordamiento */
+                overflow: hidden;           /* Oculta cualquier contenido que se desborde del contenedor */
             }
         </style>
         """

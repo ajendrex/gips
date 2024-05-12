@@ -1,6 +1,6 @@
 from django.urls import path
 
-from entrevistas.views import crear_entrevista, horarios_disponibles
+from entrevistas.views import crear_entrevista, horarios_disponibles, verificar
 
 urlpatterns = [
     path('horarios-disponibles/', horarios_disponibles, name='horarios-disponibles'),

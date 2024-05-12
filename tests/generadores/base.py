@@ -12,7 +12,7 @@ from informes.gips_service import GIPSService
 from tests.models import Resultado, AccesoTestPersona
 from utils.text import numerico_random
 
-LONGITUD_CLAVE_ARCHIVO = 12
+LONGITUD_CLAVE_ARCHIVO = 5
 
 
 class Generador(ABC, GIPSService):
@@ -61,13 +61,13 @@ class Generador(ABC, GIPSService):
 
     @staticmethod
     def _generar_qr(codigo: str) -> bytes:
-        url = f"{settings.BASE_URL}/informes/verificar/{codigo}"
+        url = f"{settings.BASE_URL}/api/entrevistas/verificar/{codigo}"
         return qrcode.make(
             url,
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
             box_size=5,
-            border=2,
+            border=0,
         )
 
     def evaluar(self):

@@ -16,7 +16,7 @@
         <p>Para verificar el certificado, ingresa la clave de acceso.</p>
         <form action="" method="post" id="verificacionForm">
             {% csrf_token %}
-            <input type="hidden" name="clave_acceso" id="clave_acceso_completa">
+            <input type="hidden" name="clave_archivo" id="clave_archivo_completa">
             <div class="clave-acceso">
                 {% for i in "12345" %}
                 <input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="digit-input" required>
@@ -37,7 +37,7 @@
             inputs.forEach(input => {
                 claveAcceso += input.value;
             });
-            document.getElementById('clave_acceso_completa').value = claveAcceso;
+            document.getElementById('clave_archivo_completa').value = claveAcceso;
         }
 
         document.getElementById('verificacionForm').addEventListener('submit', function(e) {
@@ -50,7 +50,7 @@
             const inputs = document.querySelectorAll('.digit-input');
             const todosLlenos = Array.from(inputs).every(input => input.value.length === 1);
             if (todosLlenos) {
-                actualizarClaveAcceso(); // Asegurarse de que el valor de clave_acceso se actualiza
+                actualizarClaveAcceso(); // Asegurarse de que el valor de clave_archivo se actualiza
                 document.getElementById('verificacionForm').submit();
             }
         }
