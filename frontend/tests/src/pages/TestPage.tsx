@@ -16,9 +16,19 @@ import {
     Text,
     Image,
     Center,
+    Checkbox,
+    useDisclosure,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalCloseButton,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
 } from "@chakra-ui/react"
 import {Preguntas} from "../components/Preguntas";
 import Agenda from "../components/Agenda";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     try {
@@ -41,6 +51,8 @@ const TestPage: React.FC = () => {
     const [preguntasRespondidas, setPreguntasRespondidas] = useState<boolean>(false)
     const [entrevistaAgendada, setEntrevistaAgendada] = useState<boolean>(false)
     const [terminado, setTerminado] = useState<boolean>(false)
+    const [terminosAceptados, setTerminosAceptados] = useState<boolean>(false)
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     const terminar = () => {
         window.close()
@@ -97,13 +109,40 @@ const TestPage: React.FC = () => {
                             <Text>Bienvenido(a) a esta evaluación online.</Text>
                             <Text>A continuación leerás una serie de oraciones con alternativas de respuesta.</Text>
                             <Text>En cada caso selecciona aquella que más te represente, sin pensarlo demasiado.</Text>
+                            <Checkbox
+                                checked={terminosAceptados}
+                                onChange={(e) => {
+                                    setTerminosAceptados(e.target.checked)
+                                }}
+                            >
+                                Acepto los <Button variant="link" onClick={onOpen}>Términos y Condiciones</Button>
+                            </Checkbox>
                             <Box display="flex" justifyContent="center">
-                                <Button colorScheme="teal" onClick={() => setIntroAceptada(true)}>Aceptar</Button>
+                                <Button
+                                    colorScheme="teal"
+                                    isDisabled={!terminosAceptados}
+                                    onClick={() => setIntroAceptada(true)}
+                                >
+                                    Aceptar
+                                </Button>
                             </Box>
                         </Stack>
                     </Card>
                 )}
             </Box>
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Términos y Condiciones</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <MarkdownRenderer url="terminos_y_condiciones/control_de_impulsos.md"/>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button onClick={onClose}>Cerrar</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </div>
     )
 }
