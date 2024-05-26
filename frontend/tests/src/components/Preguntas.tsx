@@ -128,30 +128,30 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
         }
     }, [preguntas, preguntaRefs])
 
-    const observarScroll = () => {
-        const alturaTotalDocumento = document.documentElement.scrollHeight
-        const alturaViewport = window.innerHeight
-        const maxScrollY = alturaTotalDocumento - alturaViewport
-        const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
-        // Calcula el índice de la pregunta basado en el scroll actual
-        const indicePreguntaEnFoco = Math.floor(window.scrollY / alturaPorPregunta)
-
-        console.debug(`h_total: ${alturaTotalDocumento}, viewPort: ${alturaViewport}, alturaPorPregunta: ${alturaPorPregunta}, maxScrolY: ${maxScrollY} scrollY: ${window.scrollY}, indicePregunta: ${indicePreguntaEnFoco}`)
-
-        // Asegura que el índice está dentro de los límites del array de preguntas
-        if (indicePreguntaEnFoco >= 0 && indicePreguntaEnFoco < (preguntas.length || 0)) {
-            const preguntaId = preguntas[indicePreguntaEnFoco].id
-            setPreguntaEnFoco(preguntaId || null)
-        }
-    }
-
     useEffect(() => {
+        const observarScroll = () => {
+            const alturaTotalDocumento = document.documentElement.scrollHeight
+            const alturaViewport = window.innerHeight
+            const maxScrollY = alturaTotalDocumento - alturaViewport
+            const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
+            // Calcula el índice de la pregunta basado en el scroll actual
+            const indicePreguntaEnFoco = Math.floor(window.scrollY / alturaPorPregunta)
+
+            console.debug(`h_total: ${alturaTotalDocumento}, viewPort: ${alturaViewport}, alturaPorPregunta: ${alturaPorPregunta}, maxScrolY: ${maxScrollY} scrollY: ${window.scrollY}, indicePregunta: ${indicePreguntaEnFoco}`)
+
+            // Asegura que el índice está dentro de los límites del array de preguntas
+            if (indicePreguntaEnFoco >= 0 && indicePreguntaEnFoco < (preguntas.length || 0)) {
+                const preguntaId = preguntas[indicePreguntaEnFoco].id
+                setPreguntaEnFoco(preguntaId || null)
+            }
+        }
+
         window.addEventListener('scroll', observarScroll)
 
         return () => {
             window.removeEventListener('scroll', observarScroll)
         }
-    }, [preguntas, observarScroll])
+    }, [preguntas])
 
     const handleAnswerSelect = (idPregunta: number, respuesta: string) => {
         const nuevasRespuestas = {...respuestas, [idPregunta]: respuesta}
@@ -173,7 +173,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
             const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
 
             // Calcula el nuevo scrollY basado en el índice de la pregunta
-            const nuevoScrollY = alturaPorPregunta * index + alturaPorPregunta / 2
+            const nuevoScrollY = alturaPorPregunta * index + alturaPorPregunta / 10
 
             // Mueve el scroll a la posición calculada
             window.scrollTo({top: nuevoScrollY, behavior: 'smooth'})
