@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useState } from 'react'
 import {useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
 import axios from "axios"
@@ -14,7 +14,8 @@ import {
     Spinner,
     Stack,
     Text,
-    useToast
+    Image,
+    Center,
 } from "@chakra-ui/react"
 import {Preguntas} from "../components/Preguntas";
 import Agenda from "../components/Agenda";
@@ -53,12 +54,16 @@ const TestPage: React.FC = () => {
         )
 
     const itemsAlignment = preguntasRespondidas ? "start" : "center"
+    const mostrarLogo = isLoading || error || !introAceptada || terminado || entrevistaAgendada
 
     return (
         <div style={{display: "flex", justifyContent: "center", alignItems: itemsAlignment, minHeight: "100vh", padding: "20px"}}>
             <Box width="100%" maxW="500px">
+                {mostrarLogo && <Image src='images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50}/>}
                 {isLoading ? (
-                    <Spinner speed="1s" />
+                    <Center>
+                        <Spinner speed="1s" size="xl" />
+                    </Center>
                 ) : error ? (
                     <Alert status="error">
                         <AlertIcon />
