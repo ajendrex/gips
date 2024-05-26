@@ -71,7 +71,7 @@ const TestPage: React.FC = () => {
     return (
         <div style={{display: "flex", justifyContent: "center", alignItems: itemsAlignment, minHeight: "100vh", padding: "20px"}}>
             <Box width="100%" maxW="500px">
-                {mostrarLogo && <Image src='images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50}/>}
+                {mostrarLogo && <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50}/>}
                 {isLoading ? (
                     <Center>
                         <Spinner speed="1s" size="xl" />
@@ -136,7 +136,7 @@ const TestPage: React.FC = () => {
                     <ModalHeader>Términos y Condiciones</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <MarkdownRenderer url="terminos_y_condiciones/control_de_impulsos.md"/>
+                        <MarkdownRenderer url="/static/terminos_y_condiciones/control_de_impulsos.md"/>
                     </ModalBody>
                     <ModalFooter>
                         <Button onClick={onClose}>Cerrar</Button>
