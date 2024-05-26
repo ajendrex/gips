@@ -1,5 +1,5 @@
 import {PreguntaLikertNOAS, RespuestaParams} from "../interfaces"
-import React, {useEffect, useRef, useState} from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import {useMutation} from "react-query"
 import {
     Alert,
@@ -151,7 +151,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
         return () => {
             window.removeEventListener('scroll', observarScroll)
         }
-    }, [preguntas])
+    }, [preguntas, observarScroll])
 
     const handleAnswerSelect = (idPregunta: number, respuesta: string) => {
         const nuevasRespuestas = {...respuestas, [idPregunta]: respuesta}
@@ -162,7 +162,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
         mutation.mutate({codigo, idPregunta, respuesta})
     }
 
-    const enfocarPregunta = (index: number) => {
+    const enfocarPregunta = useCallback((index: number) => {
         const alturaTotalDocumento = document.documentElement.scrollHeight
         const alturaViewport = window.innerHeight
         const maxScrollY = alturaTotalDocumento - alturaViewport
@@ -180,7 +180,8 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
         } else if (index < preguntaRefs.current.length) {
             setPreguntaEnFoco(preguntas[index].id)
         }
-    }
+    },
+        [preguntas, autoScroll])
 
     useEffect(() => {
         if (autoScroll && preguntaRespondida !== null) {
@@ -199,7 +200,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                     <Switch id="auto-scroll" isChecked={autoScroll} onChange={() => setAutoScroll(!autoScroll)} />
                 </FormControl>
             </Box>
-            <Box h={300} />
+            <Box h={30} />
             {
                 preguntas.map((pregunta, index) => (
                     <Box
