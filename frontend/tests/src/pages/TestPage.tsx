@@ -71,7 +71,11 @@ const TestPage: React.FC = () => {
     return (
         <div style={{display: "flex", justifyContent: "center", alignItems: itemsAlignment, minHeight: "100vh", padding: "20px"}}>
             <Box width="100%" maxW="500px">
-                {mostrarLogo && <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50}/>}
+                {mostrarLogo && (
+                    <Box display="flex" justifyContent="center">
+                        <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50} width="xs" />
+                    </Box>
+                )}
                 {isLoading ? (
                     <Center>
                         <Spinner speed="1s" size="xl" />
@@ -109,22 +113,24 @@ const TestPage: React.FC = () => {
                             <Text>Bienvenido(a) a esta evaluación online.</Text>
                             <Text>A continuación leerás una serie de oraciones con alternativas de respuesta.</Text>
                             <Text>En cada caso selecciona aquella que más te represente, sin pensarlo demasiado.</Text>
-                            <Checkbox
-                                checked={terminosAceptados}
-                                onChange={(e) => {
-                                    setTerminosAceptados(e.target.checked)
-                                }}
-                            >
-                                Acepto los <Button variant="link" onClick={onOpen}>Términos y Condiciones</Button>
-                            </Checkbox>
-                            <Box display="flex" justifyContent="center">
+                            <Box display="flex" justifyContent="center" mt={5} mb={2}>
                                 <Button
                                     colorScheme="teal"
                                     isDisabled={!terminosAceptados}
                                     onClick={() => setIntroAceptada(true)}
                                 >
-                                    Aceptar
+                                    Comenzar test
                                 </Button>
+                            </Box>
+                            <Box alignSelf="end">
+                                <Checkbox
+                                    checked={terminosAceptados}
+                                    onChange={(e) => {
+                                        setTerminosAceptados(e.target.checked)
+                                    }}
+                                >
+                                    Acepto los <Button variant="link" onClick={onOpen}>Términos y Condiciones</Button>
+                                </Checkbox>
                             </Box>
                         </Stack>
                     </Card>
