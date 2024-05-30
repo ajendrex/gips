@@ -21,23 +21,19 @@ import axios from "axios"
 import {getCsrfToken} from "../csrf"
 
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
-    try {
-        await axios.post(
-            `/api/tests/respuestas-likert-noas/?codigo=${codigo}`,
-            {
-                pregunta: idPregunta,
-                alternativa: respuesta,
+    await axios.post(
+        `/api/tests/respuestas-likert-noas/?codigo=${codigo}`,
+        {
+            pregunta: idPregunta,
+            alternativa: respuesta,
+        },
+        {
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
             },
-            {
-                headers: {
-                    'X-CSRFToken': getCsrfToken(),
-                }
-            }
-        )
-    } catch (error: any) {
-        const errorMsg = error.response.data[0] || error.response.data.detail || "Algo salió mal"
-        throw new Error(errorMsg)
-    }
+            timeout: 5000,
+        }
+    )
 }
 
 const findNextQuestion = (
@@ -84,7 +80,15 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
     const [preguntaRespondida, setPreguntaRespondida] = useState<number | null>(null)
     const [respuestasPendientes, setRespuestasPendientes] = useState<number[]>([])
     const [respuestasConError, setRespuestasConError] = useState<number[]>([])
-    const [reintentando, setReintentando] = useState(0)
+    const [reintentando, setReintentando] = useState(false)
+
+    const removeFromPendientes = (id: number) => (prev: number[]) => {
+        const newPendientes = prev.filter(i => i !== id)
+        if (!newPendientes.length) {
+            setReintentando(false)
+        }
+        return newPendientes
+    }
 
     const mutation = useMutation(
         ({codigo, idPregunta, respuesta}: RespuestaParams) => submitRespuesta({
@@ -93,13 +97,14 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
             respuesta
         }),
         {
-            onSuccess: (data, variables) => {
-                setRespuestasPendientes(respuestasPendientes.filter(id => id !== variables.idPregunta))
-                setRespuestasConError(respuestasConError.filter(id => id !== variables.idPregunta))
+            onSuccess: async (data, variables) => {
+                setRespuestasPendientes(removeFromPendientes(variables.idPregunta))
+                setRespuestasConError(prev => (prev.filter(id => id !== variables.idPregunta)))
             },
-            onError: (error, variables) => {
-                setRespuestasConError([...respuestasConError, variables.idPregunta])
-                setRespuestasPendientes(respuestasPendientes.filter(id => id !== variables.idPregunta))
+            onError: async (error, variables) => {
+                console.log('Error guardando respuesta para pregunta', variables.idPregunta)
+                setRespuestasConError(prev => ([...prev, variables.idPregunta]))
+                setRespuestasPendientes(removeFromPendientes(variables.idPregunta))
             },
             retry: 3,
             retryDelay: 1000,
@@ -108,17 +113,12 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
 
     const reintentarGuardarRespuestas = () => {
         const respuestasAReintentar = Array.from(new Set(respuestasConError))
-        for (const idPregunta of respuestasAReintentar) {
-            setReintentando(r => r + 1)
-            setRespuestasPendientes([...respuestasPendientes, idPregunta])
-            mutation.mutate(
-                {codigo, idPregunta, respuesta: respuestas[idPregunta]},
-                {
-                    onSettled: () => {
-                        setReintentando(r => r - 1)
-                    }
-                }
-            )
+        if (respuestasAReintentar.length) {
+            setReintentando(true)
+            for (const idPregunta of respuestasAReintentar) {
+                setRespuestasPendientes(prev => ([...prev, idPregunta]))
+                mutation.mutate({codigo, idPregunta, respuesta: respuestas[idPregunta]})
+            }
         }
     }
 
@@ -154,11 +154,10 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
     }, [preguntas])
 
     const handleAnswerSelect = (idPregunta: number, respuesta: string) => {
-        const nuevasRespuestas = {...respuestas, [idPregunta]: respuesta}
         setPreguntaRespondida(idPregunta)
-        setRespuestas(nuevasRespuestas)
+        setRespuestas(prev => ({...prev, [idPregunta]: respuesta}))
 
-        setRespuestasPendientes([...respuestasPendientes, idPregunta])
+        setRespuestasPendientes(prev => ([...prev, idPregunta]))
         mutation.mutate({codigo, idPregunta, respuesta})
     }
 
@@ -173,7 +172,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
             const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
 
             // Calcula el nuevo scrollY basado en el índice de la pregunta
-            const nuevoScrollY = alturaPorPregunta * index + alturaPorPregunta / 10
+            const nuevoScrollY = index * (alturaPorPregunta + alturaPorPregunta / (preguntas.length * 1.5))
 
             // Mueve el scroll a la posición calculada
             window.scrollTo({top: nuevoScrollY, behavior: 'smooth'})
@@ -191,7 +190,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
     }, [respuestas, autoScroll, preguntaRespondida, preguntas, enfocarPregunta]);
 
     return (
-        <>
+        <Box paddingBottom="100px">
             <Box position="fixed" bottom="20px" right="20px" zIndex="1000">
                 <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="auto-scroll" mb="0" mr="2">
@@ -247,7 +246,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                                             key={code}
                                             value={code}
                                             opacity={preguntaEnFoco === pregunta.id ? 1 : 0.5}
-                                            isDisabled={respuestasPendientes.includes(pregunta.id)}
+                                            isDisabled={reintentando || respuestasPendientes.includes(pregunta.id)}
                                         >
                                             {text}
                                         </Radio>
@@ -261,10 +260,12 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                     </Box>
                 ))
             }
-            <Box h={300}>
+            <Box h="500px">
                 {
                     Object.keys(respuestas).length === preguntas.length ? (
-                        respuestasConError.length || reintentando ? (
+                        respuestasPendientes.length ? (
+                            <Spinner />
+                        ) : respuestasConError.length || reintentando ? (
                             <Stack spacing="30px" align="center">
                                 <Alert status="error">
                                     <AlertIcon />
@@ -286,7 +287,7 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                                     </Button>
                                 )}
                             </Stack>
-                        ) : respuestasPendientes.length ? null : (
+                        ) : (
                             <Card p="10px">
                                 <Box
                                     display="flex"
@@ -295,11 +296,23 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                                     flexDirection="column"
                                 >
                                     <Stack spacing="30px">
-                                        <Heading size="sm" mb="10px" mt="50px" textAlign="center">
-                                            ¡Perfecto!<br />
+                                        <Heading size="sm" mt="40px" textAlign="center">
+                                            ¡Felicidades!<br />
+                                        </Heading>
+                                        <Heading size="xs" mt="5px">
+                                            ¡Has completado la primera etapa de tu evaluación psicológica sobre el control de los impulsos!
                                         </Heading>
                                         <Text lineHeight="25px">
-                                            Ahora debes agendar una entrevista con el psicólogo en el siguiente paso.
+                                            Ahora solo falta un paso más para finalizar tu evaluación: agendar una entrevista
+                                            psicológica por videollamada con uno de nuestros profesionales.
+                                        </Text>
+                                        <Text lineHeight="25px">
+                                            No te preocupes, el día que elijas un psicólogo de nuestro equipo se pondrá en
+                                            contacto contigo a través de WhatsApp antes de la entrevista para explicarte
+                                            y coordinar todos los detalles.
+                                        </Text>
+                                        <Text lineHeight="25px">
+                                            ¡Haz clic en el botón "Agendar Entrevista" para programar tu cita!
                                         </Text>
                                         <Box display="flex" justifyContent="center" mb="10px">
                                             <Button
@@ -315,6 +328,6 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                     )) : null
                 }
             </Box>
-        </>
+        </Box>
     )
 }

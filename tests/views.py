@@ -22,6 +22,7 @@ class RespuestaLikertNOASView(CreateAPIView):
 
     def dispatch(self, request, *args, **kwargs):
         # return JsonResponse({"message": "No se puede acceder a esta vista."}, status=403)
+        # sleep(1)
         return super().dispatch(request, *args, **kwargs)
 
     def get_serializer_context(self) -> Dict[str, Any]:

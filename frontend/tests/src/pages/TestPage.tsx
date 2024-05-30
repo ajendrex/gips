@@ -69,11 +69,18 @@ const TestPage: React.FC = () => {
     const mostrarLogo = isLoading || error || !introAceptada || terminado || entrevistaAgendada
 
     return (
-        <div style={{display: "flex", justifyContent: "center", alignItems: itemsAlignment, minHeight: "100vh", padding: "20px"}}>
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignItems={itemsAlignment}
+            p="20px"
+            mt="20px"
+            alignContent={itemsAlignment}
+        >
             <Box width="100%" maxW="500px">
                 {mostrarLogo && (
                     <Box display="flex" justifyContent="center">
-                        <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' marginBottom={50} width="xs" />
+                        <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' mb="80px" width="xs" />
                     </Box>
                 )}
                 {isLoading ? (
@@ -149,7 +156,7 @@ const TestPage: React.FC = () => {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-        </div>
+        </Box>
     )
 }
 
