@@ -109,7 +109,12 @@ const TestPage: React.FC = () => {
                         <Agenda codigo={codigo} successCallback={() => setEntrevistaAgendada(true)} />
                     </Card>
                 ) : introAceptada ? (
-                    <Preguntas preguntas={prueba!.preguntalikertnoas_set} codigo={codigo} successCallback={() => setPreguntasRespondidas(true)} />
+                    <Preguntas
+                        preguntas={prueba!.preguntalikertnoas_set}
+                        codigo={codigo}
+                        successCallback={() => setPreguntasRespondidas(true)}
+                        terminar={terminar}
+                    />
                 ) : (
                     <Card p="10px">
                         <Stack spacing="15px">

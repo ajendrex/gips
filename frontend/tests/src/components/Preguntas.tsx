@@ -70,9 +70,10 @@ interface PreguntasProps {
     preguntas: PreguntaLikertNOAS[]
     codigo: string
     successCallback: () => void
+    terminar: () => void
 }
 
-export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) => {
+export const Preguntas = ({preguntas, codigo, successCallback, terminar}: PreguntasProps) => {
     const [autoScroll, setAutoScroll] = useState(true)
     const [respuestas, setRespuestas] = useState<{ [preguntaId: number]: string }>({})
     const preguntaRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -315,12 +316,20 @@ export const Preguntas = ({preguntas, codigo, successCallback}: PreguntasProps) 
                                             ¡Haz clic en el botón "Agendar Entrevista" para programar tu cita!
                                         </Text>
                                         <Box display="flex" justifyContent="center" mb="10px">
-                                            <Button
-                                                colorScheme="teal"
-                                                onClick={successCallback}
-                                            >
-                                                Agendar Llamada
-                                            </Button>
+                                            <Stack spacing="10px">
+                                                <Button
+                                                    colorScheme="teal"
+                                                    onClick={successCallback}
+                                                >
+                                                    Agendar Entrevista
+                                                </Button>
+                                                <Button
+                                                    colorScheme="gray"
+                                                    onClick={terminar}
+                                                >
+                                                    Cancelar Evaluación
+                                                </Button>
+                                            </Stack>
                                         </Box>
                                     </Stack>
                                 </Box>
