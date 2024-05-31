@@ -99,10 +99,15 @@ const TestPage: React.FC = () => {
                     </Card>
                 ) : entrevistaAgendada ? (
                         <Card p="10px">
-                            <Alert status="success">
-                                <AlertDescription>La entrevista ha sido agendada con éxito.</AlertDescription>
-                                <CloseButton position="absolute" right="8px" top="8px" onClick={terminar}/>
-                            </Alert>
+                            <Stack spacing="20px">
+                                <Alert status="success">
+                                    <AlertDescription>Tu entrevista ha sido agendada con éxito.</AlertDescription>
+                                    <CloseButton position="absolute" right="8px" top="8px" onClick={terminar}/>
+                                </Alert>
+                                <Box display="flex" justifyContent="center">
+                                    <Button colorScheme="gray" onClick={terminar}>Cerrar</Button>
+                                </Box>
+                            </Stack>
                         </Card>
                 ) : preguntasRespondidas ? (
                     <Card p="10px">
