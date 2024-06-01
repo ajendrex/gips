@@ -250,6 +250,6 @@ class GeneradorPuntajeEscala(Generador):
     def _generar_parrafo3(self):
         texto_general = self.resultado.evaluacion["puntajes"]["GENERAL"]["texto"]
         return (
-            f"Pruebas psicológicas indican un {texto_general}. Sub-escalas de impulsividad no planificada, atencional "
+            f"Pruebas psicológicas indican {texto_general}. Sub-escalas de impulsividad no planificada, atencional "
             "y motora (BIS-11) arrojan el siguiente resultado:"
         )
