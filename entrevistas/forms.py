@@ -1,14 +1,14 @@
 from django import forms
 
-from entrevistas.models import Entrevistador, Entrevista
+from entrevistas.models import Sicologo, Entrevista
 
 
 class EntrevistaForm(forms.ModelForm):
     entrevistador_choice = forms.ModelChoiceField(
-        queryset=Entrevistador.objects.all(),
+        queryset=Sicologo.objects.all(),
         required=True,
-        label="Entrevistador",
-        help_text="Select a value from the related model."
+        label="Sicólogo",
+        help_text="Seleccione un sicólogo para realizar la entrevista."
     )
 
     class Meta:

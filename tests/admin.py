@@ -5,7 +5,9 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.timezone import make_aware
 
+from entrevistas.models import TZ_CHILE
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio
 from utils.fechas import month_to_str, weekday_to_str
@@ -90,7 +92,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
         if entrevista:
             if entrevista.resultado.informe:
                 return 'Evaluación finalizada'
-            if entrevista.fecha_fin < datetime.now():
+            if entrevista.fecha_fin < make_aware(datetime.now(), timezone=TZ_CHILE):
                 return 'Entrevista fuera de plazo'
             return 'Entrevista programada'
 
@@ -125,7 +127,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
 
         if entrevista.resultado.informe:
             return 'Evaluación finalizada'
-        if entrevista.fecha_fin < datetime.now():
+        if entrevista.fecha_fin < make_aware(datetime.now(), timezone=TZ_CHILE):
             return 'Entrevista fuera de plazo'
 
         dia = weekday_to_str[entrevista.fecha.weekday()]

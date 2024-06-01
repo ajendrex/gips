@@ -110,6 +110,7 @@ class GeneradorPuntajeEscala(Generador):
         qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
 
         domain = settings.BASE_URL.replace("http://", "").replace("https://", "")
+        sicologo = self.resultado.acceso.entrevistas.last().entrevistador
 
         html = f"""
         <html>
@@ -126,9 +127,9 @@ class GeneradorPuntajeEscala(Generador):
               <li>{texto_motora}</li>
             </ul>
             <div class="box-firma">
-              <img src="informes/assets/firmas/pruiz.png" alt="Firma Pablo Ruiz Urbina" class="firma-img" />
+              <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
               <hr>
-              <p>Pablo Ruiz Urbina<br>Psicólogo<br><span>N° Reg: 123851</span></p>
+              <p>{sicologo}<br>Psicólogo<br><span>N° Reg: {sicologo.nro_registro}</span></p>
             </div>
             <div class="verification">
                 <div class="column image-column">
@@ -163,6 +164,12 @@ class GeneradorPuntajeEscala(Generador):
             @page {
                 size: A4; /* Change from the default size of A4 */
                 margin: 20mm; /* Set margin on each page */
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
             }
             h1, h2 {
                 text-align: center;

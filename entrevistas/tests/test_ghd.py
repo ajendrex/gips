@@ -5,22 +5,22 @@ import pytest
 from django.contrib.auth.models import User
 
 from entrevistas.ghd import Horario, HorarioGlobal
-from entrevistas.models import TZ_CHILE, Entrevistador
+from entrevistas.models import TZ_CHILE, Sicologo
 
 
 @pytest.mark.django_db
 class TestGeneradorDeHorasDeDisponibilidad:
     def _create_entrevistador(self):
         user = User.objects.create_user(username="entrevistador")
-        return Entrevistador.objects.create(usuario=user)
+        return Sicologo.objects.create(usuario=user)
 
     def _create_entrevistador1(self):
         user = User.objects.create_user(username="entrevistador1")
-        return Entrevistador.objects.create(usuario=user)
+        return Sicologo.objects.create(usuario=user)
 
     def _create_entrevistador2(self):
         user = User.objects.create_user(username="entrevistador2")
-        return Entrevistador.objects.create(usuario=user)
+        return Sicologo.objects.create(usuario=user)
 
     def test_gdh_sin_bloqueos(self):
         entrevistador = self._create_entrevistador()

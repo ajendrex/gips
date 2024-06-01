@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 
 from entrevistas.ghd import HorarioGlobal, MINUTOS_BLOQUE_ENTREVISTA, BloqueHorario, HORA_FMT
-from entrevistas.models import TZ_CHILE, Entrevista, Entrevistador
+from entrevistas.models import TZ_CHILE, Entrevista, Sicologo
 from entrevistas.serializers import EntrevistaSerializer
 from tests.models import AccesoTestPersona, Resultado
 from utils.numbers import obtener_numero_aleatorio
@@ -133,7 +133,7 @@ def crear_entrevista(request):
 def _safe_crear_entrevista(entrevistador_id: int, inicio: datetime, termino: datetime, acceso_id: int) -> Entrevista:
     with transaction.atomic():
         # Obtener el entrevistador y bloquearlo
-        entrevistador = Entrevistador.objects.select_for_update().get(pk=entrevistador_id)
+        entrevistador = Sicologo.objects.select_for_update().get(pk=entrevistador_id)
 
         # Verificar solapamientos
         if entrevistador.entrevistas.filter(fecha_inicio__lt=termino, fecha_fin__gt=inicio).exists():

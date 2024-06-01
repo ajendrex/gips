@@ -3,7 +3,7 @@ from typing import Union
 
 from django.utils.timezone import localtime
 
-from entrevistas.models import TZ_CHILE, Entrevistador
+from entrevistas.models import TZ_CHILE, Sicologo
 from utils.fechas import weekday_to_str
 
 MINUTOS_BLOQUE_ENTREVISTA = 30
@@ -29,7 +29,7 @@ class BloqueHorario:
 
 
 class Horario:
-    def __init__(self, entrevistador: Entrevistador):
+    def __init__(self, entrevistador: Sicologo):
         self.entrevistador = entrevistador
 
     def generar_bloques_disponibles(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[BloqueHorario]:
@@ -146,7 +146,7 @@ class Horario:
 
 class HorarioGlobal:
     def __init__(self):
-        self.entrevistadores = Entrevistador.objects.filter(horarios_disponibles__isnull=False)
+        self.entrevistadores = Sicologo.objects.filter(horarios_disponibles__isnull=False)
 
     def generar_bloques_disponibles(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[BloqueHorario]:
         horarios = self._generar_horarios(fecha_inicio, fecha_fin).values()
@@ -180,7 +180,7 @@ class HorarioGlobal:
 
         return horario_global
 
-    def obtener_entrevistadores(self, inicio: Union[datetime, str], fin: Union[datetime, str]) -> list[Entrevistador]:
+    def obtener_entrevistadores(self, inicio: Union[datetime, str], fin: Union[datetime, str]) -> list[Sicologo]:
         if isinstance(inicio, str):
             inicio = datetime.strptime(inicio, "%Y-%m-%d %H:%M").astimezone(TZ_CHILE)
 
@@ -195,7 +195,7 @@ class HorarioGlobal:
             if len(horarios) == 1 and horarios[0].inicio == inicio and horarios[0].fin == fin
         ]
 
-    def _generar_horarios(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[Entrevistador, list[BloqueHorario]]:
+    def _generar_horarios(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[Sicologo, list[BloqueHorario]]:
         return {
             entrevistador: Horario(entrevistador).generar_bloques_disponibles(fecha_inicio, fecha_fin)
             for entrevistador in self.entrevistadores

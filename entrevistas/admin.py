@@ -6,7 +6,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 
 from entrevistas.forms import EntrevistaForm
-from entrevistas.models import Disponibilidad, Entrevistador, Bloqueo, Entrevista
+from entrevistas.models import Disponibilidad, Sicologo, Bloqueo, Entrevista
 from tests.generadores.base import get_generador
 
 
@@ -23,8 +23,8 @@ class BloqueoInline(admin.TabularInline):
         return ['-fecha_inicio']
 
 
-@admin.register(Entrevistador)
-class EntrevistadorAdmin(admin.ModelAdmin):
+@admin.register(Sicologo)
+class SicologoAdmin(admin.ModelAdmin):
     list_display = ("usuario", "first_name", "last_name")
     inlines = [DisponibilidadInline, BloqueoInline]
 

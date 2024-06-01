@@ -3,12 +3,16 @@ from zoneinfo import ZoneInfo
 from django.contrib.auth.models import User
 from django.db import models
 
-from informes.models import Sicologo
 from tests.models import Persona, AccesoTestPersona, Resultado
 
 
-class Entrevistador(models.Model):
+class Sicologo(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.RESTRICT, related_name="entrevistador")
+    nro_registro = models.CharField(max_length=20, blank=False)
+    firma = models.ImageField(upload_to="firmas/", blank=False)
+
+    class Meta:
+        verbose_name = "Sicólogo"
 
     def __str__(self):
         return self.usuario.get_full_name()
@@ -21,12 +25,9 @@ class Entrevistador(models.Model):
     def last_name(self):
         return self.usuario.last_name
 
-    class Meta:
-        verbose_name_plural = "entrevistadores"
-
 
 class Entrevista(models.Model):
-    entrevistador = models.ForeignKey(Entrevistador, on_delete=models.RESTRICT, related_name="entrevistas")
+    entrevistador = models.ForeignKey(Sicologo, on_delete=models.RESTRICT, related_name="entrevistas")
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -82,7 +83,7 @@ MINUTO_CHOICES = (
 
 
 class Disponibilidad(models.Model):
-    entrevistador = models.ForeignKey(Entrevistador, on_delete=models.CASCADE, related_name="horarios_disponibles")
+    entrevistador = models.ForeignKey(Sicologo, on_delete=models.CASCADE, related_name="horarios_disponibles")
     dia = models.CharField(
         "día",
         max_length=9,
@@ -106,7 +107,7 @@ class Disponibilidad(models.Model):
 
 
 class Bloqueo(models.Model):
-    entrevistador = models.ForeignKey(Entrevistador, on_delete=models.CASCADE, related_name="bloqueos")
+    entrevistador = models.ForeignKey(Sicologo, on_delete=models.CASCADE, related_name="bloqueos")
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     motivo = models.TextField()
