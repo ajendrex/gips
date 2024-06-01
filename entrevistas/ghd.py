@@ -4,16 +4,7 @@ from typing import Union
 from django.utils.timezone import localtime
 
 from entrevistas.models import TZ_CHILE, Entrevistador
-
-weekday_to_str = {
-    0: "lunes",
-    1: "martes",
-    2: "miercoles",
-    3: "jueves",
-    4: "viernes",
-    5: "sabado",
-    6: "domingo",
-}
+from utils.fechas import weekday_to_str
 
 MINUTOS_BLOQUE_ENTREVISTA = 30
 HORA_FMT = "%Y-%m-%d %H:%M"

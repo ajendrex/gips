@@ -7,6 +7,7 @@ from django.utils.html import format_html
 
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio
+from utils.fechas import month_to_str, weekday_to_str
 
 
 @admin.register(Gentilicio)
@@ -61,7 +62,7 @@ class TestAdmin(admin.ModelAdmin):
 class AccesoTestPersonaInline(admin.TabularInline):
     model = AccesoTestPersona
     extra = 0
-    readonly_fields = ('codigo', 'url', 'link_whatsapp')
+    readonly_fields = ('codigo', 'url', 'presentacion_whatsapp', 'confirmacion_whatsapp')
 
     def url(self, obj):
         return format_html('<a href="{}" target="blank"><img src="{}" style="width: 20px" alt="Visit"/></a>',
@@ -69,19 +70,26 @@ class AccesoTestPersonaInline(admin.TabularInline):
                            '/static/admin/img/icon-viewlink.svg')
     url.short_description = 'Acceder al test'
 
-    def link_whatsapp(self, obj: AccesoTestPersona):
-        persona = obj.persona
-        empresa = obj.acceso_test.mandante
-        telefono = persona.telefono
+    def _link_whatsapp(self, obj: AccesoTestPersona, msg: str, title: str):
+        telefono = obj.persona.telefono
 
         if telefono.startswith('+'):
             telefono = telefono[1:]
 
         return format_html(
-            '<a href="https://wa.me/{}/?{}" target="blank">Abrir mensaje</a>',
+            '<a href="https://wa.me/{}/?{}" target="blank">{}</a>',
             telefono,
-            urlencode({
-                'text': f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
+            urlencode({'text': msg,}),
+            title,
+        )
+
+    def presentacion_whatsapp(self, obj: AccesoTestPersona):
+        persona = obj.persona
+        empresa = obj.acceso_test.mandante
+
+        return self._link_whatsapp(
+            obj,
+            f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
                 'en evaluaciones psicológicas en linea.\n\n'
                 f'*{empresa}* nos solicitó evaluar tus impulsos para tu acreditación como '
                 f'personal de seguridad.\n\n'
@@ -95,9 +103,35 @@ class AccesoTestPersonaInline(admin.TabularInline):
                 'Te Saluda,\n'
                 '*Equipo El sicológico*\n'
                 'www.elsicologico.cl',
-            }),
+            'Abrir Presentación en Whatsapp',
         )
-    link_whatsapp.short_description = 'Presentación en Whatsapp'
+    presentacion_whatsapp.short_description = 'Presentación en Whatsapp'
+
+    def confirmacion_whatsapp(self, obj: AccesoTestPersona):
+        entrevista = obj.entrevistas.last()
+
+        if not entrevista:
+            return 'Sin entrevista programada'
+
+        dia = weekday_to_str[entrevista.fecha.weekday()]
+        mes = month_to_str[entrevista.fecha.month]
+        fecha = f'{entrevista.fecha.day} de {mes}'
+        hora = entrevista.fecha.strftime('%H:%M')
+
+        return self._link_whatsapp(
+            obj,
+            f'¡Hola {obj.persona}!\n\n'
+            'Tu entrevista psicológica está confirmada. '
+            f'Nos vemos el día {dia} {fecha} a las {hora} hrs a través de video llamada.\n\n'
+            'Antes de la hora programada, un miembro de nuestro equipo de psicólogos se pondrá en contacto '
+            'contigo a través de WhatsApp para afinar los detalles de la entrevista y video llamada. '
+            'Si por alguna razón necesitas re agendar o tienes algún problema, no dudes en escribirnos. '
+            'Estamos aquí para ayudarte en lo que necesites.\n\n'
+            '¡Nos vemos pronto y que tengas un excelente día!\n\n'
+            'Te saluda,\n'
+            'El equipo de El Sicológico',
+            'Abrir Confirmación en Whatsapp',
+        )
 
 
 @admin.register(AccesoTest)
