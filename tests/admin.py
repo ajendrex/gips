@@ -1,4 +1,5 @@
 import json
+from datetime import date, datetime
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -84,6 +85,15 @@ class AccesoTestPersonaInline(admin.TabularInline):
         )
 
     def presentacion_whatsapp(self, obj: AccesoTestPersona):
+        entrevista = obj.entrevistas.last()
+
+        if entrevista:
+            if entrevista.resultado.informe:
+                return 'Evaluación finalizada'
+            if entrevista.fecha_fin < datetime.now():
+                return 'Entrevista fuera de plazo'
+            return 'Entrevista programada'
+
         persona = obj.persona
         empresa = obj.acceso_test.mandante
 
@@ -112,6 +122,11 @@ class AccesoTestPersonaInline(admin.TabularInline):
 
         if not entrevista:
             return 'Sin entrevista programada'
+
+        if entrevista.resultado.informe:
+            return 'Evaluación finalizada'
+        if entrevista.fecha_fin < datetime.now():
+            return 'Entrevista fuera de plazo'
 
         dia = weekday_to_str[entrevista.fecha.weekday()]
         mes = month_to_str[entrevista.fecha.month]
