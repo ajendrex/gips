@@ -1,6 +1,7 @@
 import json
 
-from django.contrib import admin
+from django import forms
+from django.contrib import admin, messages
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, reverse
 from django.utils.html import format_html
@@ -74,10 +75,11 @@ class EntrevistaAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     ("entrevistador_choice", "fecha_inicio", "fecha_fin"),
+                    ("resultado", "tiempo_test"),
                     "observaciones",
                     "resultado_entrevista",
-                    ("resultado", "tiempo_test", "link_informe"),
                     "previsualizacion",
+                    "link_informe",
                 ),
             },
         ),
@@ -192,3 +194,13 @@ class EntrevistaAdmin(admin.ModelAdmin):
 
         change_form_url = reverse('admin:entrevistas_entrevista_change', args=(object_id,))
         return HttpResponseRedirect(change_form_url)
+
+    def save_model(self, request: HttpRequest, obj: Entrevista, form: forms.ModelForm, change: bool):
+        if change:
+            if "resultado_entrevista" in form.changed_data or "observaciones" in form.changed_data:
+                if obj.resultado.informe:
+                    obj.resultado.informe = None
+                    obj.resultado.save()
+                    self.message_user(request, "Informe eliminado, se debe regenerar!", messages.WARNING)
+
+        super().save_model(request, obj, form, change)
