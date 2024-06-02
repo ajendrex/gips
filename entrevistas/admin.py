@@ -106,7 +106,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
         local_fecha_inicio = timezone.localtime(obj.fecha_inicio)
         local_hora_inicio = local_fecha_inicio.strftime("%H:%M")
 
-        cuando = "en breve" if (local_fecha_inicio - ahora).minutes < 1 else "pronto"
+        cuando = "en breve" if (local_fecha_inicio - ahora).seconds < 60 * 60 else "pronto"
 
         return link_whatsapp(
             persona,
@@ -122,7 +122,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
             "La entrevista durará entre 15 y 20 minutos. Quiero que te sientas lo más cómodo/a posible, así que tómate "
             "un momento para respirar profundamente y relajarte antes de que comencemos.\n\n"
             "Si tienes alguna pregunta o necesitas aclarar algo, no dudes en escribirme.\n\n"
-            f"¡Nos vemos {cuando} y te deseo mucha suerte!"
+            f"¡Nos vemos {cuando} y te deseo mucha suerte!\n\n"
             "Un abrazo,\n"
             f"{obj.entrevistador}\n"
             f"{obj.entrevistador.titulo}\n"
