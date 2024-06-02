@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "django_countries",
     "reversion",
     "django_json_widget",
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "gips.urls"
@@ -117,6 +119,7 @@ LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"
 
 USE_I18N = True
+USE_L10N = True
 
 USE_TZ = True
 

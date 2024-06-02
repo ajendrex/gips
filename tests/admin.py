@@ -12,6 +12,7 @@ from django.utils.timezone import make_aware
 
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio, ResultadoEvaluacion
+from utils.admin import link_whatsapp
 from utils.fechas import month_to_str, weekday_to_str, TZ_CHILE
 
 
@@ -94,19 +95,6 @@ class AccesoTestPersonaInline(admin.TabularInline):
                            '/static/admin/img/icon-viewlink.svg')
     url.short_description = 'Acceder al test'
 
-    def _link_whatsapp(self, obj: AccesoTestPersona, msg: str, title: str):
-        telefono = obj.persona.telefono
-
-        if telefono.startswith('+'):
-            telefono = telefono[1:]
-
-        return format_html(
-            '<a href="https://wa.me/{}/?{}" target="blank">{}</a>',
-            telefono,
-            urlencode({'text': msg,}),
-            title,
-        )
-
     def presentacion_whatsapp(self, obj: AccesoTestPersona):
         entrevista = obj.entrevistas.last()
 
@@ -120,8 +108,8 @@ class AccesoTestPersonaInline(admin.TabularInline):
         persona = obj.persona
         empresa = obj.acceso_test.mandante
 
-        return self._link_whatsapp(
-            obj,
+        return link_whatsapp(
+            persona,
             f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
                 'en evaluaciones psicológicas en linea.\n\n'
                 f'*{empresa}* nos solicitó evaluar tus impulsos para tu acreditación como '
@@ -138,7 +126,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
                 'www.elsicologico.cl',
             'Abrir Presentación en Whatsapp',
         )
-    presentacion_whatsapp.short_description = 'Presentación en Whatsapp'
+    presentacion_whatsapp.short_description = 'Mensaje Inicial'
 
     def confirmacion_whatsapp(self, obj: AccesoTestPersona):
         entrevista = obj.entrevistas.last()
@@ -156,8 +144,8 @@ class AccesoTestPersonaInline(admin.TabularInline):
         fecha = f'{entrevista.fecha.day} de {mes}'
         hora = entrevista.fecha.strftime('%H:%M')
 
-        return self._link_whatsapp(
-            obj,
+        return link_whatsapp(
+            obj.persona,
             f'¡Hola {obj.persona}!\n\n'
             'Tu entrevista psicológica está confirmada. '
             f'Nos vemos el día {dia} {fecha} a las {hora} hrs a través de video llamada.\n\n'
@@ -170,6 +158,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
             'El equipo de El Sicológico',
             'Abrir Confirmación en Whatsapp',
         )
+    confirmacion_whatsapp.short_description = "Confirmación de Entrevista"
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)

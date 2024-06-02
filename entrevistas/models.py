@@ -11,6 +11,8 @@ class Sicologo(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.RESTRICT, related_name="entrevistador")
     nro_registro = models.CharField(max_length=20, blank=False)
     firma = models.ImageField(upload_to="firmas/", blank=False)
+    genero = models.CharField(max_length=1, choices=(("M", "Masculino"), ("F", "Femenino")))
+    titulo = models.CharField("título", max_length=100, blank=False, help_text="Ej: Psicólogo Clínico")
 
     class Meta:
         verbose_name = "Sicólogo"

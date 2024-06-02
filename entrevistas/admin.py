@@ -2,14 +2,18 @@ import json
 
 from django import forms
 from django.contrib import admin, messages
+from django.contrib.humanize.templatetags import humanize
+from django.contrib.humanize.templatetags.humanize import naturaltime, naturalday
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from entrevistas.forms import EntrevistaForm
 from entrevistas.models import Disponibilidad, Sicologo, Bloqueo, Entrevista
 from tests.generadores.base import get_generador
+from utils.admin import link_whatsapp
 
 
 class DisponibilidadInline(admin.TabularInline):
@@ -49,7 +53,14 @@ class SicologoAdmin(admin.ModelAdmin):
 
 @admin.register(Entrevista)
 class EntrevistaAdmin(admin.ModelAdmin):
-    list_display = ("entrevistador", "entrevistado", "email_entrevistado", "fecha_inicio", "fecha_creacion")
+    list_display = (
+        "entrevistador",
+        "entrevistado",
+        "email_entrevistado",
+        "fecha_inicio",
+        "fecha_creacion",
+        "presentacion_whatsapp",
+    )
     list_filter = ("entrevistador",)
     search_fields = (
         "entrevistador__usuario__first_name",
@@ -62,7 +73,6 @@ class EntrevistaAdmin(admin.ModelAdmin):
     date_hierarchy = "fecha_inicio"
     form = EntrevistaForm
     readonly_fields = (
-        "fecha_inicio",
         "fecha_fin",
         "tiempo_test",
         "link_informe",
@@ -84,6 +94,42 @@ class EntrevistaAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    def presentacion_whatsapp(self, obj: Entrevista) -> str:
+        ahora = timezone.now()
+
+        if obj.fecha_fin.date() < ahora.date():
+            return "Entrevista ya realizada"
+
+        persona = obj.entrevistado
+        rol = "psicólogo" if obj.entrevistador.genero == "M" else "psicóloga"
+        local_fecha_inicio = timezone.localtime(obj.fecha_inicio)
+        local_hora_inicio = local_fecha_inicio.strftime("%H:%M")
+
+        cuando = "en breve" if (local_fecha_inicio - ahora).minutes < 1 else "pronto"
+
+        return link_whatsapp(
+            persona,
+            f"Hola {persona}!\n\n"
+            f"Soy {obj.entrevistador.usuario.first_name}, {rol} del equipo de El Sicológico."
+            f"Te escribo para recordarte que {naturalday(local_fecha_inicio.date())} a las "
+            f"{local_hora_inicio} hrs tenemos agendada tu entrevista psicológica"
+            " por videollamada de WhatsApp para completar tu evaluación de impulsos.\n\n"
+            "Seré yo quien realice la videollamada. Durante la entrevista, por favor, ten tu cámara encendida "
+            "y el micrófono activado, ya que es un requisito para evaluarte.\n\n"
+            "Te sugiero que busques un lugar tranquilo y sin distracciones para que podamos aprovechar al máximo "
+            "nuestro tiempo juntos.\n\n"
+            "La entrevista durará entre 15 y 20 minutos. Quiero que te sientas lo más cómodo/a posible, así que tómate "
+            "un momento para respirar profundamente y relajarte antes de que comencemos.\n\n"
+            "Si tienes alguna pregunta o necesitas aclarar algo, no dudes en escribirme.\n\n"
+            f"¡Nos vemos {cuando} y te deseo mucha suerte!"
+            "Un abrazo,\n"
+            f"{obj.entrevistador}\n"
+            f"{obj.entrevistador.titulo}\n"
+            "El Sicológico",
+            "Abrir presentación en Whatsapp",
+        )
+    presentacion_whatsapp.short_description = "Mensaje Previo"
 
     def get_formset_kwargs(self, request: HttpRequest, obj: Entrevista, inline, prefix):
         form = super().get_formset_kwargs(request, obj, inline, prefix)
