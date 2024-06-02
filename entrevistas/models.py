@@ -1,9 +1,10 @@
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.db import models
 
-from tests.models import Persona, AccesoTestPersona, Resultado
+from tests.models import Persona, AccesoTestPersona, Resultado, ResultadoEvaluacion, Test
 
 
 class Sicologo(models.Model):
@@ -34,17 +35,29 @@ class Entrevista(models.Model):
     acceso = models.ForeignKey(AccesoTestPersona, on_delete=models.RESTRICT, related_name="entrevistas")
     resultado = models.OneToOneField(Resultado, on_delete=models.RESTRICT, related_name="entrevista", null=True)
     observaciones = models.TextField(blank=True)
+    resultado_entrevista = models.ForeignKey(
+        ResultadoEvaluacion,
+        on_delete=models.RESTRICT,
+        related_name="entrevistas",
+        null=True,
+        blank=True,
+        help_text="Si se indica un valor, este tiene precedencia sobre el resultado del test."
+    )
 
     def __str__(self):
         return f"{self.entrevistador} : {self.entrevistado} el {self.fecha}"
 
     @property
-    def entrevistado(self):
+    def entrevistado(self) -> Persona:
         return self.acceso.persona
 
     @property
-    def fecha(self):
+    def fecha(self) -> datetime:
         return self.fecha_inicio
+
+    @property
+    def test(self) -> Test:
+        return self.acceso.test
 
 
 HORA_CHOICES = (

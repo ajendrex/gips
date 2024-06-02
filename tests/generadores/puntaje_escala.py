@@ -112,6 +112,22 @@ class GeneradorPuntajeEscala(Generador):
         domain = settings.BASE_URL.replace("http://", "").replace("https://", "")
         sicologo = self.resultado.acceso.entrevistas.last().entrevistador
 
+        entrevista = self.resultado.acceso.entrevistas.last()
+
+        if entrevista and entrevista.resultado_entrevista:
+            apto_no_apto = entrevista.resultado_entrevista.texto
+        else:
+            tramo_general = self.resultado.evaluacion["puntajes"]["GENERAL"]["nivel"]
+
+            if tramo_general == "BAJO":
+                apto_no_apto = "apto"
+            elif tramo_general == "MODERADO":
+                apto_no_apto = "apto con reservas"
+            else:
+                apto_no_apto = "no apto"
+
+        labor = self.resultado.acceso.get_cargo_display()
+
         html = f"""
         <html>
           <head>{self._estilos()}</head>
@@ -120,12 +136,14 @@ class GeneradorPuntajeEscala(Generador):
             <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
             <p>{p1}</p>
             <p>{p2}</p>
-            <p>{p3}</p>
             <ul>
               <li>{texto_no_planificada}</li>
               <li>{texto_atencional}</li>
               <li>{texto_motora}</li>
             </ul>
+            <p>{p3}</p>
+            <p>En conclusión, se determina que el Sr(a) <b>{self.resultado.persona.nombre_completo}</b>
+             es <b>{apto_no_apto}</b> para el cargo de <b>{labor}</b>.</p>
             <div class="box-firma">
               <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
               <hr>
@@ -226,30 +244,18 @@ class GeneradorPuntajeEscala(Generador):
         run = rut_chile.format_rut_with_dots(persona.rut)
         nacionalidad = Gentilicio.objects.get(pais=persona.nacionalidad).gentilicio
 
-        tramo_general = self.resultado.evaluacion["puntajes"]["GENERAL"]["nivel"]
-
-        if tramo_general == "BAJO":
-            apto_no_apto = "apto"
-        elif tramo_general == "MODERADO":
-            apto_no_apto = "apto con reservas"
-        else:
-            apto_no_apto = "no apto"
-
-        labor = self.resultado.acceso.get_cargo_display()
-
         return (
             "El profesional que firma este documento certifica que el Sr(a) "
             f"<b>{nombre_completo}</b> RUN <b>{run}</b> Nacionalidad <b>{nacionalidad}</b> ha realizado una evaluación "
-            f"psicológica del control de los impulsos, encontrándole {apto_no_apto} para realizar labores de "
-            f"{labor}."
+            f"psicológica del control de los impulsos."
         )
 
     def _generar_parrafo2(self):
-        return self.resultado.entrevista.observaciones
-
-    def _generar_parrafo3(self):
         texto_general = self.resultado.evaluacion["puntajes"]["GENERAL"]["texto"]
         return (
             f"Pruebas psicológicas indican {texto_general}. Sub-escalas de impulsividad no planificada, atencional "
             "y motora (BIS-11) arrojan el siguiente resultado:"
         )
+
+    def _generar_parrafo3(self):
+        return self.resultado.entrevista.observaciones

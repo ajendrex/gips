@@ -3,13 +3,15 @@ from datetime import date, datetime
 from typing import List, Optional
 from urllib.parse import urlencode
 
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.timezone import make_aware
 
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
-    RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio
+    RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio, ResultadoEvaluacion
 from utils.fechas import month_to_str, weekday_to_str, TZ_CHILE
 
 
@@ -53,13 +55,29 @@ class TramoCategoriaEvaluacionInline(ShortTextoInlineMixin, admin.TabularInline)
     style_height = "50px"
 
 
+class ResultadoEvaluacionForm(forms.ModelForm):
+    class Meta:
+        model = ResultadoEvaluacion
+        fields = "__all__"
+        help_texts = {
+            "texto": mark_safe(
+                'Se intercalará en la frase &quot;Encontrándole &lt;texto&gt; para realizar las funciones de...&quot;')
+        }
+
+
+class ResultadoEvaluacionInline(ShortTextoInlineMixin, admin.TabularInline):
+    model = ResultadoEvaluacion
+    extra = 0
+    form = ResultadoEvaluacionForm
+
+
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'fecha_creacion', 'fecha_actualizacion')
     search_fields = ('nombre',)
     date_hierarchy = 'fecha_creacion'
     ordering = ('-id',)
-    inlines = [TramoCategoriaEvaluacionInline, PreguntaLikertNOASInline]
+    inlines = [TramoCategoriaEvaluacionInline, ResultadoEvaluacionInline, PreguntaLikertNOASInline]
 
 
 class AccesoTestPersonaInline(admin.TabularInline):

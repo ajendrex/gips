@@ -1,7 +1,7 @@
 import json
 
 from django.contrib import admin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, reverse
 from django.utils.html import format_html
 
@@ -74,12 +74,21 @@ class EntrevistaAdmin(admin.ModelAdmin):
                 "fields": (
                     ("entrevistador_choice", "fecha_inicio", "fecha_fin"),
                     "observaciones",
+                    "resultado_entrevista",
                     ("resultado", "tiempo_test", "link_informe"),
                     "evaluacion_pretty",
                 ),
             },
         ),
     )
+
+    def get_formset_kwargs(self, request: HttpRequest, obj: Entrevista, inline, prefix):
+        form = super().get_formset_kwargs(request, obj, inline, prefix)
+
+        if obj:
+            form.fields["resultado_entrevista"].queryset = obj.acceso.test.resultados_posibles.all()
+
+        return form
 
     def email_entrevistado(self, obj):
         return obj.entrevistado.email

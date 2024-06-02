@@ -101,6 +101,20 @@ class TramoCategoriaEvaluacion(models.Model):
         return f"{self.categoria} - {self.nombre}"
 
 
+class ResultadoEvaluacion(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="resultados_posibles")
+    nombre = models.CharField(max_length=100)
+    texto = models.TextField()
+
+    class Meta:
+        unique_together = ("test", "nombre")
+        verbose_name = "Resultado de evaluación"
+        verbose_name_plural = "Resultados de evaluación"
+
+    def __str__(self):
+        return self.nombre
+
+
 class PreguntaBase(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     texto = models.TextField()
@@ -199,6 +213,10 @@ class AccesoTestPersona(models.Model):
             tiempo_str = f"{segundos} segundos"
 
         return tiempo_str
+
+    @property
+    def test(self) -> Test:
+        return self.acceso_test.test
 
 
 class Resultado(models.Model):
