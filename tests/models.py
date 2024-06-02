@@ -128,12 +128,29 @@ class PreguntaLikertNOAS(PreguntaBase):
     puntaje_siempre = models.IntegerField("Siempre o casi siempre", default=4)
 
 
+class Cargo(models.TextChoices):
+    NOCHERO = "NOCHERO", "Nochero"
+    RONDIN = "RONDIN", "Rondín"
+    PORTERO = "PORTERO", "Portero"
+    CONSERJE = "CONSERJE", "Conserje"
+    VIGILANTE_PRIVADO = "VIGILANTE_PRIVADO", "Vigilante Privado"
+    GUARDIA_DE_SEGURIDAD = "GUARDIA_DE_SEGURIDAD", "Guardia de Seguridad"
+    ENCARGADO_DE_SEGURIDAD = "ENCARGADO_DE_SEGURIDAD", "Encargado de Seguridad"
+    SUPERVISOR_DE_SEGURIDAD = "SUPERVISOR_DE_SEGURIDAD", "Supervisor de Seguridad"
+    JEFE_DE_SEGURIDAD = "JEFE_DE_SEGURIDAD", "Jefe de Seguridad"
+    ASESOR_DE_SEGURIDAD = "ASESOR_DE_SEGURIDAD", "Asesor de Seguridad"
+    CAPACITADOR_DE_SEGURIDAD_PRIVADA = "CAPACITADOR_DE_SEGURIDAD_PRIVADA", "Capacitador de Seguridad Privada"
+    INSTALADOR_TECNICO_DE_SEGURIDAD = "INSTALADOR_TECNICO_DE_SEGURIDAD", "Instalador Técnico de Seguridad"
+    OPERADOR_DE_CCTV_Y_ALARMAS = "OPERADOR_DE_CCTV_Y_ALARMAS", "Operador de CCTV y Alarmas"
+
+
 class AccesoTest(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="accesos")
     fecha_creacion = models.DateTimeField("fecha de creación", auto_now_add=True)
     fecha_vencimiento = models.DateTimeField("fecha de vencimiento")
     mandante = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name="accesos_mandante")
     valor_unitario = models.IntegerField(default=12000)
+    cargo_predefinido = models.CharField(max_length=50, choices=Cargo.choices, default=Cargo.GUARDIA_DE_SEGURIDAD)
 
     def __str__(self):
         return f"{self.test} - {self.mandante} - {self.fecha_creacion.date()} - {self.fecha_vencimiento.date()}"
@@ -145,6 +162,7 @@ class AccesoTestPersona(models.Model):
     codigo = models.CharField(max_length=20, unique=True)
     inicio_respuestas_ts = models.DateTimeField("inicio test", null=True)
     fin_respuestas_ts = models.DateTimeField("término test", null=True)
+    cargo = models.CharField(max_length=50, choices=Cargo.choices)
 
     class Meta:
         unique_together = ("acceso_test", "persona")

@@ -153,6 +153,12 @@ class AccesoTestPersonaInline(admin.TabularInline):
             'Abrir Confirmación en Whatsapp',
         )
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        if obj:
+            formset.form.base_fields['cargo'].initial = obj.cargo_predefinido
+        return formset
+
 
 @admin.register(AccesoTest)
 class AccesoTestAdmin(admin.ModelAdmin):

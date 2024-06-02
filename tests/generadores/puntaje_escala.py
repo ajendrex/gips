@@ -235,7 +235,7 @@ class GeneradorPuntajeEscala(Generador):
         else:
             apto_no_apto = "no apto"
 
-        labor = "&lt;POR HACER?&gt;"
+        labor = self.resultado.acceso.get_cargo_display()
 
         return (
             "El profesional que firma este documento certifica que el Sr(a) "
