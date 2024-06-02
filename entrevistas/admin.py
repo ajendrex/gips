@@ -111,7 +111,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
         return link_whatsapp(
             persona,
             f"Hola {persona}!\n\n"
-            f"Soy {obj.entrevistador.usuario.first_name}, {rol} del equipo de El Sicológico."
+            f"Soy {obj.entrevistador.usuario.first_name}, {rol} del equipo de El Sicológico. "
             f"Te escribo para recordarte que {naturalday(local_fecha_inicio.date())} a las "
             f"{local_hora_inicio} hrs tenemos agendada tu entrevista psicológica"
             " por videollamada de WhatsApp para completar tu evaluación de impulsos.\n\n"
