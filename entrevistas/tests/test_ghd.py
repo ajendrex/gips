@@ -1,11 +1,11 @@
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import pytest
 from django.contrib.auth.models import User
 
 from entrevistas.ghd import Horario, HorarioGlobal
-from entrevistas.models import TZ_CHILE, Sicologo
+from entrevistas.models import Sicologo
+from utils.fechas import TZ_CHILE
 
 
 @pytest.mark.django_db

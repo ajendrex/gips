@@ -63,7 +63,9 @@ class EntrevistaAdmin(admin.ModelAdmin):
         "fecha_inicio",
         "fecha_fin",
         "evaluacion_pretty",
+        "tiempo_test",
         "link_informe",
+        "resultado",
     )
     fieldsets = (
         (
@@ -72,7 +74,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
                 "fields": (
                     ("entrevistador_choice", "fecha_inicio", "fecha_fin"),
                     "observaciones",
-                    ("resultado", "link_informe"),
+                    ("resultado", "tiempo_test", "link_informe"),
                     "evaluacion_pretty",
                 ),
             },
@@ -115,6 +117,10 @@ class EntrevistaAdmin(admin.ModelAdmin):
             )
         return ""
     link_informe.short_description = "Informe"
+
+    def tiempo_test(self, instance: Entrevista) -> str:
+        return instance.acceso.tiempo_test
+    tiempo_test.short_description = "Tiempo de Test"
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}

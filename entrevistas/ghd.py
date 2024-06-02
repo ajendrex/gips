@@ -3,8 +3,8 @@ from typing import Union
 
 from django.utils.timezone import localtime
 
-from entrevistas.models import TZ_CHILE, Sicologo
-from utils.fechas import weekday_to_str
+from entrevistas.models import Sicologo
+from utils.fechas import weekday_to_str, TZ_CHILE
 
 MINUTOS_BLOQUE_ENTREVISTA = 30
 HORA_FMT = "%Y-%m-%d %H:%M"

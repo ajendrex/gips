@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo
+
 weekday_to_str = {
     0: "lunes",
     1: "martes",
@@ -22,3 +24,5 @@ month_to_str = {
     11: "noviembre",
     12: "diciembre",
 }
+
+TZ_CHILE = ZoneInfo("America/Santiago")

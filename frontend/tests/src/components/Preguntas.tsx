@@ -71,9 +71,10 @@ interface PreguntasProps {
     codigo: string
     successCallback: () => void
     terminar: () => void
+    error: string | null
 }
 
-export const Preguntas = ({preguntas, codigo, successCallback, terminar}: PreguntasProps) => {
+export const Preguntas = ({preguntas, codigo, successCallback, terminar, error}: PreguntasProps) => {
     const [autoScroll, setAutoScroll] = useState(true)
     const [respuestas, setRespuestas] = useState<{ [preguntaId: number]: string }>({})
     const preguntaRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -331,6 +332,12 @@ export const Preguntas = ({preguntas, codigo, successCallback, terminar}: Pregun
                                                 </Button>
                                             </Stack>
                                         </Box>
+                                        {error ? (
+                                            <Alert status="error">
+                                                <AlertIcon />
+                                                <AlertDescription>{error}</AlertDescription>
+                                            </Alert>
+                                        ) : null}
                                     </Stack>
                                 </Box>
                             </Card>

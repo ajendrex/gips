@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import {useQuery} from 'react-query'
+import {useMutation, useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
 import axios from "axios"
-import {Prueba} from "../interfaces"
+import {Prueba, RespuestaParams} from "../interfaces"
 import {
     Alert, AlertDescription,
     AlertIcon,
@@ -29,6 +29,7 @@ import {
 import {Preguntas} from "../components/Preguntas";
 import Agenda from "../components/Agenda";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import {getCsrfToken} from "../csrf";
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     try {
@@ -38,6 +39,33 @@ const fetchPrueba = async (codigo: string): Promise<Prueba> => {
         const errorMsg = error.response.data[0] || error.response.data.detail || "Algo salió mal"
         throw new Error(errorMsg)
     }
+}
+
+const iniciarTest = async (codigo: string): Promise<void> => {
+    await axios.post(
+        `/api/tests/tests/iniciar/?codigo=${codigo}`,
+        {},
+        {
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+            },
+            timeout: 5000,
+        }
+    )
+}
+
+const finalizarTest = async (codigo: string): Promise<void> => {
+    await axios.post(
+        `/api/tests/tests/finalizar/?codigo=${codigo}`,
+        {},
+        {
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+            },
+            timeout: 5000,
+        }
+    )
+
 }
 
 function useQueryParams() {
@@ -67,6 +95,28 @@ const TestPage: React.FC = () => {
 
     const itemsAlignment = preguntasRespondidas ? "start" : "center"
     const mostrarLogo = isLoading || error || !introAceptada || terminado || entrevistaAgendada
+
+    const initTest = useMutation(
+        () => iniciarTest(codigo),
+        {
+            onSuccess: async (data, variables) => {
+                setIntroAceptada(true)
+            },
+            retry: 3,
+            retryDelay: 1000,
+        }
+    )
+
+    const finishTest = useMutation(
+        () => finalizarTest(codigo),
+        {
+            onSuccess: async (data, variables) => {
+                setPreguntasRespondidas(true)
+            },
+            retry: 3,
+            retryDelay: 1000,
+        }
+    )
 
     return (
         <Box
@@ -117,8 +167,9 @@ const TestPage: React.FC = () => {
                     <Preguntas
                         preguntas={prueba!.preguntalikertnoas_set}
                         codigo={codigo}
-                        successCallback={() => setPreguntasRespondidas(true)}
+                        successCallback={() => finishTest.mutate()}
                         terminar={terminar}
+                        error={finishTest.error ? "Ocurrió un error inesperado, por favor intenta de nuevo." : null}
                     />
                 ) : (
                     <Card p="10px">
@@ -134,11 +185,18 @@ const TestPage: React.FC = () => {
                                 <Button
                                     colorScheme="teal"
                                     isDisabled={!terminosAceptados}
-                                    onClick={() => setIntroAceptada(true)}
+                                    onClick={() => initTest.mutate()}
                                 >
                                     Comenzar test
                                 </Button>
                             </Box>
+                            {initTest.error ? (
+                                <Alert status="error">
+                                    <AlertIcon />
+                                    <AlertTitle>Error</AlertTitle>
+                                    <AlertDescription>Ocurrió un error, por favor intenta de nuevo.</AlertDescription>
+                                </Alert>
+                            ) : null}
                             <Box alignSelf="end">
                                 <Checkbox
                                     checked={terminosAceptados}

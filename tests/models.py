@@ -1,11 +1,14 @@
+from datetime import datetime
 from typing import Dict, Set
 
 import reversion
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import make_aware
 from django_countries.fields import CountryField
 from rut_chile import rut_chile
 
+from utils.fechas import TZ_CHILE
 from utils.text import alfanumerico_random
 
 
@@ -140,6 +143,8 @@ class AccesoTestPersona(models.Model):
     acceso_test = models.ForeignKey(AccesoTest, on_delete=models.CASCADE, related_name="ruts")
     persona = models.ForeignKey(Persona, on_delete=models.RESTRICT, related_name="accesos")
     codigo = models.CharField(max_length=20, unique=True)
+    inicio_respuestas_ts = models.DateTimeField("inicio test", null=True)
+    fin_respuestas_ts = models.DateTimeField("término test", null=True)
 
     class Meta:
         unique_together = ("acceso_test", "persona")
@@ -150,6 +155,32 @@ class AccesoTestPersona(models.Model):
     def save(self, *args, **kwargs):
         self.codigo = self.codigo or alfanumerico_random(20)
         super().save(*args, **kwargs)
+
+    def iniciar(self):
+        self.inicio_respuestas_ts = make_aware(datetime.now(), timezone=TZ_CHILE)
+        self.save()
+
+    def finalizar(self):
+        self.fin_respuestas_ts = make_aware(datetime.now(), timezone=TZ_CHILE)
+        self.save()
+
+    @property
+    def tiempo_test(self) -> str:
+        if not self.fin_respuestas_ts or not self.inicio_respuestas_ts:
+            return "Sin Datos"
+
+        total_segundos = (self.fin_respuestas_ts - self.inicio_respuestas_ts).seconds
+        minutos = total_segundos // 60
+        segundos = total_segundos % 60
+
+        if minutos:
+            tiempo_str = f"{minutos} minutos"
+            if segundos:
+                tiempo_str += f" y {segundos} segundos"
+        else:
+            tiempo_str = f"{segundos} segundos"
+
+        return tiempo_str
 
 
 class Resultado(models.Model):

@@ -1,5 +1,6 @@
 import json
 from datetime import date, datetime
+from typing import List, Optional
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -7,10 +8,9 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.timezone import make_aware
 
-from entrevistas.models import TZ_CHILE
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio
-from utils.fechas import month_to_str, weekday_to_str
+from utils.fechas import month_to_str, weekday_to_str, TZ_CHILE
 
 
 @admin.register(Gentilicio)
@@ -65,7 +65,10 @@ class TestAdmin(admin.ModelAdmin):
 class AccesoTestPersonaInline(admin.TabularInline):
     model = AccesoTestPersona
     extra = 0
-    readonly_fields = ('codigo', 'url', 'presentacion_whatsapp', 'confirmacion_whatsapp')
+    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'presentacion_whatsapp', 'confirmacion_whatsapp')
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     def url(self, obj):
         return format_html('<a href="{}" target="blank"><img src="{}" style="width: 20px" alt="Visit"/></a>',
@@ -185,16 +188,33 @@ class ResultadoAdmin(admin.ModelAdmin):
     )
     list_filter = ('acceso__acceso_test__test', 'acceso__persona__nacionalidad', 'acceso__persona__es_natural')
     date_hierarchy = 'fecha_creacion'
-    readonly_fields = ('persona', 'test', 'fecha_creacion', 'evaluacion_pretty', 'clave_archivo')
+    readonly_fields = (
+        'persona',
+        'test',
+        'fecha_creacion',
+        'evaluacion_pretty',
+        'informe',
+        'clave_archivo',
+        'inicio_test',
+        'fin_test',
+    )
     inlines = [RespuestaLikertNOASInline]
     fieldsets = (
         (None, {
             'fields': (('persona', 'fecha_creacion'),)
         }),
         ('Evaluación', {
-            'fields': (('test', 'informe', 'clave_archivo'), 'evaluacion_pretty',),
+            'fields': ('test', 'inicio_test', 'fin_test', 'informe', 'clave_archivo', 'evaluacion_pretty'),
         }),
     )
+
+    def inicio_test(self, instance: Resultado) -> Optional[datetime]:
+        return instance.acceso.inicio_respuestas_ts
+    inicio_test.short_description = "Inicio del test"
+
+    def fin_test(self, instance: Resultado) -> Optional[datetime]:
+        return instance.acceso.fin_respuestas_ts
+    fin_test.short_description = "Fin del test"
 
     def evaluacion_pretty(self, instance: Resultado) -> str:
         if instance and instance.evaluacion:

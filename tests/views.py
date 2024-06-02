@@ -2,6 +2,7 @@ from time import sleep
 from typing import Dict, Any
 
 from django.http import JsonResponse
+from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 
 from tests.models import Resultado
@@ -32,3 +33,15 @@ class RespuestaLikertNOASView(CreateAPIView):
         context = super().get_serializer_context()
         context["resultado"] = resultado
         return context
+
+
+def iniciar_test(request):
+    acceso = get_and_validate_acceso(request)
+    acceso.iniciar()
+    return JsonResponse({"message": "Test iniciado."})
+
+
+def finalizar_test(request):
+    acceso = get_and_validate_acceso(request)
+    acceso.finalizar()
+    return JsonResponse({"message": "Test finalizado."})

@@ -16,9 +16,10 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 
 from entrevistas.ghd import HorarioGlobal, MINUTOS_BLOQUE_ENTREVISTA, BloqueHorario, HORA_FMT
-from entrevistas.models import TZ_CHILE, Entrevista, Sicologo
+from entrevistas.models import Entrevista, Sicologo
 from entrevistas.serializers import EntrevistaSerializer
 from tests.models import AccesoTestPersona, Resultado
+from utils.fechas import TZ_CHILE
 from utils.numbers import obtener_numero_aleatorio
 from utils.request import get_and_validate_acceso
 

@@ -111,6 +111,3 @@ class Bloqueo(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     motivo = models.TextField()
-
-
-TZ_CHILE = ZoneInfo("America/Santiago")
