@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from entrevistas.forms import EntrevistaForm
 from entrevistas.models import Disponibilidad, Sicologo, Bloqueo, Entrevista
@@ -62,10 +63,10 @@ class EntrevistaAdmin(admin.ModelAdmin):
     readonly_fields = (
         "fecha_inicio",
         "fecha_fin",
-        "evaluacion_pretty",
         "tiempo_test",
         "link_informe",
         "resultado",
+        "previsualizacion",
     )
     fieldsets = (
         (
@@ -76,7 +77,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
                     "observaciones",
                     "resultado_entrevista",
                     ("resultado", "tiempo_test", "link_informe"),
-                    "evaluacion_pretty",
+                    "previsualizacion",
                 ),
             },
         ),
@@ -117,6 +118,18 @@ class EntrevistaAdmin(admin.ModelAdmin):
             )
         return ""
     evaluacion_pretty.short_description = "Evaluación"
+
+    def previsualizacion(self, instance: Entrevista) -> str:
+        generador = get_generador(instance.resultado)
+
+        if generador:
+            try:
+                return mark_safe(generador.generar_html_evaluacion())
+            except Exception as e:
+                return f"Error al previsualizar evaluación: {e}"
+
+        return "No se puede generar previsualización"
+    previsualizacion.short_description = "Previsualización de evaluación en el informe"
 
     def link_informe(self, instance: Entrevista) -> str:
         if instance and instance.resultado and instance.resultado.informe:

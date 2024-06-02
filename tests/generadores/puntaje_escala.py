@@ -1,7 +1,6 @@
 import base64
 from io import BytesIO
 
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from qrcode.image.pil import PilImage
@@ -98,19 +97,57 @@ class GeneradorPuntajeEscala(Generador):
         return evaluacion
 
     def _generar_informe(self, qr_image: PilImage) -> bytes:
+        output = BytesIO()
+        qr_image.save(output, format="PNG")
+        qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
+        return HTML(string=self._generar_html_informe(qr_image_uri), base_url=settings.BASE_DIR).write_pdf()
+
+    def _generar_html_informe(self, qr_image_uri: str) -> str:
+        domain = settings.BASE_URL.replace("http://", "").replace("https://", "")
+        sicologo = self.resultado.acceso.entrevistas.last().entrevistador
+
+        html = f"""
+                <html>
+                  <head>{self._estilos()}</head>
+                  <body>
+                    <h1>CERTIFICADO</h1>
+                    <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
+                    {self.generar_html_evaluacion()}
+                    <div class="box-firma">
+                      <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
+                      <hr>
+                      <p>{sicologo}<br>Psicólogo<br><span>N° Reg: {sicologo.nro_registro}</span></p>
+                    </div>
+                    <div class="verification">
+                        <div class="column image-column">
+                            <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
+                        </div>
+                        <div class="column content-column">
+                            <div>
+                                Para verificar la autenticidad<br>
+                                escanee el código QR o visite<br>
+                                <a
+                                 href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
+                                 >
+                                    {domain}/verificar/{self.resultado.acceso.codigo}
+                                </a><br>
+                                e ingrese el código <b>{self.resultado.clave_archivo}</b>
+                            </div>
+                        </div>
+                    </div>
+                  </body>
+                </html>
+                """
+
+        return html
+
+    def generar_html_evaluacion(self) -> str:
         p1 = self._generar_parrafo1()
         p2 = self._generar_parrafo2()
         p3 = self._generar_parrafo3()
         texto_no_planificada = self.resultado.evaluacion["puntajes"]["NO_PLANIFICADA"]["texto"]
         texto_atencional = self.resultado.evaluacion["puntajes"]["COGNITIVA"]["texto"]
         texto_motora = self.resultado.evaluacion["puntajes"]["MOTORA"]["texto"]
-
-        output = BytesIO()
-        qr_image.save(output, format="PNG")
-        qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
-
-        domain = settings.BASE_URL.replace("http://", "").replace("https://", "")
-        sicologo = self.resultado.acceso.entrevistas.last().entrevistador
 
         entrevista = self.resultado.acceso.entrevistas.last()
 
@@ -128,12 +165,7 @@ class GeneradorPuntajeEscala(Generador):
 
         labor = self.resultado.acceso.get_cargo_display()
 
-        html = f"""
-        <html>
-          <head>{self._estilos()}</head>
-          <body>
-            <h1>CERTIFICADO</h1>
-            <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
+        return f"""
             <p>{p1}</p>
             <p>{p2}</p>
             <ul>
@@ -144,36 +176,7 @@ class GeneradorPuntajeEscala(Generador):
             <p>{p3}</p>
             <p>En conclusión, se determina que el Sr(a) <b>{self.resultado.persona.nombre_completo}</b>
              es <b>{apto_no_apto}</b> para el cargo de <b>{labor}</b>.</p>
-            <div class="box-firma">
-              <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
-              <hr>
-              <p>{sicologo}<br>Psicólogo<br><span>N° Reg: {sicologo.nro_registro}</span></p>
-            </div>
-            <div class="verification">
-                <div class="column image-column">
-                    <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
-                </div>
-                <div class="column content-column">
-                    <div>
-                        Para verificar la autenticidad<br>
-                        escanee el código QR o visite<br>
-                        <a
-                         href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
-                         >
-                            {domain}/verificar/{self.resultado.acceso.codigo}
-                        </a><br>
-                        e ingrese el código <b>{self.resultado.clave_archivo}</b>
-                    </div>
-                </div>
-            </div>
-          </body>
-        </html>
         """
-        soup = BeautifulSoup(html, "html.parser")
-        f = open("informe.html", "w")
-        f.write(soup.prettify())
-        f.close()
-        return HTML(string=html, base_url=settings.BASE_DIR).write_pdf()
 
     @staticmethod
     def _estilos() -> str:

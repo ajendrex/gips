@@ -59,6 +59,10 @@ class Generador(ABC, GIPSService):
 
         self._add_success_message("Informe generado")
 
+    @abstractmethod
+    def generar_html_evaluacion(self) -> str:
+        ...
+
     @staticmethod
     def _generar_qr(codigo: str) -> bytes:
         url = f"{settings.BASE_URL}/api/entrevistas/verificar/{codigo}"
@@ -111,7 +115,7 @@ class Generador(ABC, GIPSService):
         ...
 
 
-def get_generador(resultado: Optional[Resultado], request: Optional[HttpRequest]) -> Optional[Generador]:
+def get_generador(resultado: Optional[Resultado], request: Optional[HttpRequest] = None) -> Optional[Generador]:
     from tests.generadores.puntaje_escala import GeneradorPuntajeEscala
 
     if resultado:
