@@ -13,9 +13,6 @@
 {% block object-tools-items %}
 {{ block.super }}
 <li>
-    <a href="evaluar/" {% if puede_evaluar %}class="button"{% else %}class="button disabled-link"{% endif %}>Evaluar</a>
-</li>
-<li>
     <a href="generar_informe/" {% if puede_generar_informe %}class="button"{% else %}class="button disabled-link"{% endif %}>Generar informe</a>
 </li>
 {% endblock %}

@@ -150,18 +150,14 @@ class EntrevistaAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
 
         if request.method == "GET":
+            self._evaluar(request, object_id)
+
             entrevista: Entrevista = self.get_object(request, object_id)
-
-            extra_context["puede_evaluar"] = False
             extra_context["puede_generar_informe"] = False
-
             generador = get_generador(entrevista.resultado if entrevista else None, request)
 
             if generador:
-                extra_context["puede_evaluar"] = generador.is_valid()
-
-                if extra_context["puede_evaluar"]:
-                    extra_context["puede_generar_informe"] = generador.puede_generar_informe()
+                extra_context["puede_generar_informe"] = generador.is_valid() and generador.puede_generar_informe()
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
@@ -174,15 +170,18 @@ class EntrevistaAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def evaluar(self, request, object_id):
+        self._evaluar(request, object_id)
+
+        change_form_url = reverse('admin:entrevistas_entrevista_change', args=(object_id,))
+        return HttpResponseRedirect(change_form_url)
+
+    def _evaluar(self, request, object_id):
         entrevista: Entrevista = self.get_object(request, object_id)
 
         generador = get_generador(entrevista.resultado, request)
 
         if generador:
             generador.evaluar()
-
-        change_form_url = reverse('admin:entrevistas_entrevista_change', args=(object_id,))
-        return HttpResponseRedirect(change_form_url)
 
     def generar_informe(self, request, object_id):
         entrevista = self.get_object(request, object_id)
