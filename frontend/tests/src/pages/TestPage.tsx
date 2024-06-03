@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {useMutation, useQuery} from 'react-query'
 import {useLocation} from 'react-router-dom'
 import axios from "axios"
-import {Prueba, RespuestaParams} from "../interfaces"
+import {Prueba} from "../interfaces"
 import {
     Alert, AlertDescription,
     AlertIcon,
@@ -26,10 +26,9 @@ import {
     ModalBody,
     ModalFooter,
 } from "@chakra-ui/react"
-import {Preguntas} from "../components/Preguntas";
-import Agenda from "../components/Agenda";
-import MarkdownRenderer from "../components/MarkdownRenderer";
-import {getCsrfToken} from "../csrf";
+import {Preguntas} from "../components/Preguntas"
+import Agenda from "../components/Agenda"
+import MarkdownRenderer from "../components/MarkdownRenderer"
 
 const fetchPrueba = async (codigo: string): Promise<Prueba> => {
     try {
@@ -46,9 +45,6 @@ const iniciarTest = async (codigo: string): Promise<void> => {
         `/api/tests/tests/iniciar/?codigo=${codigo}`,
         {},
         {
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
-            },
             timeout: 5000,
         }
     )
@@ -59,9 +55,6 @@ const finalizarTest = async (codigo: string): Promise<void> => {
         `/api/tests/tests/finalizar/?codigo=${codigo}`,
         {},
         {
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
-            },
             timeout: 5000,
         }
     )

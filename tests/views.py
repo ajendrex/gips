@@ -2,7 +2,8 @@ from time import sleep
 from typing import Dict, Any
 
 from django.http import JsonResponse
-from rest_framework.decorators import action
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 
 from tests.models import Resultado
@@ -10,6 +11,7 @@ from tests.serializers import TestSerializer, RespuestaLikertNOASSerializer
 from utils.request import get_and_validate_acceso
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class TestView(RetrieveAPIView):
     serializer_class = TestSerializer
 
@@ -18,6 +20,7 @@ class TestView(RetrieveAPIView):
         return acceso.acceso_test.test
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class RespuestaLikertNOASView(CreateAPIView):
     serializer_class = RespuestaLikertNOASSerializer
 
@@ -35,12 +38,14 @@ class RespuestaLikertNOASView(CreateAPIView):
         return context
 
 
+@csrf_exempt
 def iniciar_test(request):
     acceso = get_and_validate_acceso(request)
     acceso.iniciar()
     return JsonResponse({"message": "Test iniciado."})
 
 
+@csrf_exempt
 def finalizar_test(request):
     acceso = get_and_validate_acceso(request)
     acceso.finalizar()

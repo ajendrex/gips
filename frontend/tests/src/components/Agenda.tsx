@@ -9,7 +9,6 @@ import {
   Text,
 } from '@chakra-ui/react'
 import axios from 'axios'
-import { getCsrfToken } from "../csrf";
 import { ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import {useMutation} from "react-query";
 
@@ -38,7 +37,6 @@ const Agenda = ({codigo, successCallback}: {codigo: string, successCallback: () 
       { fecha: selectedTime?.inicio },
       {
         headers: {
-          'X-CSRFToken': getCsrfToken(),
           'Content-Type': 'application/json',
         },
       }),

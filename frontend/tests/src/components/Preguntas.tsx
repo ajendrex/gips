@@ -18,7 +18,6 @@ import {
     Text
 } from "@chakra-ui/react"
 import axios from "axios"
-import {getCsrfToken} from "../csrf"
 
 const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams): Promise<void> => {
     await axios.post(
@@ -28,9 +27,6 @@ const submitRespuesta = async ({codigo, idPregunta, respuesta}: RespuestaParams)
             alternativa: respuesta,
         },
         {
-            headers: {
-                'X-CSRFToken': getCsrfToken(),
-            },
             timeout: 5000,
         }
     )

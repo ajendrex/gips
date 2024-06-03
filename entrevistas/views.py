@@ -11,6 +11,7 @@ from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils.timezone import make_aware
+from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
@@ -28,6 +29,7 @@ class EntrevistadorConEntrevistasException(Exception):
     pass
 
 
+@csrf_exempt
 def horarios_disponibles(request):
     try:
         get_and_validate_acceso(request)
@@ -83,6 +85,7 @@ def _split_bloques(bloques: List[BloqueHorario]) -> List[BloqueHorario]:
     return bloques_separados
 
 
+@csrf_exempt
 @api_view(['POST'])  # decodifica request.body y escribe en request.data
 def crear_entrevista(request):
     if request.method != "POST":
@@ -155,6 +158,7 @@ def _safe_crear_entrevista(entrevistador_id: int, inicio: datetime, termino: dat
         )
 
 
+@csrf_exempt
 def verificar(request, clave_acceso):
     if request.method == "POST":
         clave_archivo = request.POST.get("clave_archivo")
