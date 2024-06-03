@@ -54,8 +54,8 @@ class SicologoAdmin(admin.ModelAdmin):
 @admin.register(Entrevista)
 class EntrevistaAdmin(admin.ModelAdmin):
     list_display = (
-        "entrevistador",
         "entrevistado",
+        "entrevistador",
         "email_entrevistado",
         "fecha_inicio",
         "fecha_creacion",
