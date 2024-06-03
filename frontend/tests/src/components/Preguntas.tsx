@@ -135,7 +135,7 @@ export const Preguntas = ({preguntas, codigo, successCallback, terminar, error}:
             const alturaTotalDocumento = document.documentElement.scrollHeight
             const alturaViewport = window.innerHeight
             const maxScrollY = alturaTotalDocumento - alturaViewport
-            const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
+            const alturaPorPregunta = (maxScrollY - 400) / (preguntas.length || 1)
             // Calcula el índice de la pregunta basado en el scroll actual
             const indicePreguntaEnFoco = Math.floor(window.scrollY / alturaPorPregunta)
 
@@ -171,7 +171,7 @@ export const Preguntas = ({preguntas, codigo, successCallback, terminar, error}:
         if (index === -1) {
             window.scrollTo({top: maxScrollY, behavior: 'smooth'})
         } else if (autoScroll) {
-            const alturaPorPregunta = maxScrollY / (preguntas.length || 1)
+            const alturaPorPregunta = (maxScrollY - 400) / (preguntas.length || 1)
 
             // Calcula el nuevo scrollY basado en el índice de la pregunta
             const nuevoScrollY = index * (alturaPorPregunta + alturaPorPregunta / (preguntas.length * 1.5))
@@ -193,7 +193,7 @@ export const Preguntas = ({preguntas, codigo, successCallback, terminar, error}:
 
     return (
         <Box paddingBottom="100px">
-            <Box position="fixed" bottom="20px" right="20px" zIndex="1000">
+            <Box position="fixed" top="20px" right="20px" zIndex="1000">
                 <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="auto-scroll" mb="0" mr="2">
                         Auto-scroll
