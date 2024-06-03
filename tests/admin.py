@@ -25,7 +25,7 @@ class GentilicioAdmin(admin.ModelAdmin):
 class PersonaAdmin(admin.ModelAdmin):
     list_display = ('rut', 'nombre_completo', 'email', 'telefono', 'nacionalidad', 'fecha_nacimiento')
     search_fields = ('rut', 'nombres', 'apellido_paterno', 'apellido_materno', 'email', 'telefono')
-    list_filter = ('nacionalidad', 'es_natural')
+    list_filter = 'es_natural',
     date_hierarchy = 'fecha_nacimiento'
     ordering = ('-id',)
 
@@ -167,13 +167,33 @@ class AccesoTestPersonaInline(admin.TabularInline):
         return formset
 
 
+class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
+    verbose_name_plural = "Accesos sin entrevista"
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(entrevistas__isnull=True)
+
+
+class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
+    verbose_name_plural = "Accesos con entrevista"
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(entrevistas__isnull=False).distinct()
+
+
 @admin.register(AccesoTest)
 class AccesoTestAdmin(admin.ModelAdmin):
-    list_display = ('test', 'fecha_creacion', 'fecha_vencimiento', 'mandante', 'valor_unitario')
+    list_display = ('mandante', 'test',  'fecha_creacion', 'fecha_vencimiento', 'valor_unitario', 'cant_evaluaciones')
     search_fields = ('test__nombre', 'mandante__nombres', 'mandante__apellido_paterno', 'mandante__apellido_materno')
     date_hierarchy = 'fecha_creacion'
     list_filter = ('test', 'mandante__es_natural')
-    inlines = [AccesoTestPersonaInline]
+    inlines = [AccesoTestPersonaConEntrevista, AccesoTestPersonaSinEntrevista]
+
+    @staticmethod
+    def cant_evaluaciones(obj: AccesoTest):
+        return obj.ruts.count()
 
 
 class RespuestaLikertNOASInline(admin.TabularInline):
