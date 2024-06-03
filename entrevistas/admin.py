@@ -73,7 +73,6 @@ class EntrevistaAdmin(admin.ModelAdmin):
     date_hierarchy = "fecha_inicio"
     form = EntrevistaForm
     readonly_fields = (
-        "fecha_fin",
         "tiempo_test",
         "link_informe",
         "resultado",
@@ -154,7 +153,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
         read_only_fields = super().get_readonly_fields(request, obj)
 
         if not request.user.is_superuser:
-            read_only_fields += ('entrevistador', 'acceso')
+            read_only_fields += ('entrevistador', 'acceso', 'fecha_inicio', 'fecha_fin')
 
         return read_only_fields
 
