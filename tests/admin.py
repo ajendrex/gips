@@ -6,10 +6,12 @@ from urllib.parse import urlencode
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import make_aware
 
+from entrevistas.models import Entrevista
 from tests.models import Persona, Test, PreguntaLikertNOAS, AccesoTest, AccesoTestPersona, Resultado, \
     RespuestaLikertNOAS, TramoCategoriaEvaluacion, Gentilicio, ResultadoEvaluacion
 from utils.admin import link_whatsapp
@@ -129,7 +131,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
     presentacion_whatsapp.short_description = 'Mensaje Inicial'
 
     def confirmacion_whatsapp(self, obj: AccesoTestPersona):
-        entrevista = obj.entrevistas.last()
+        entrevista: Optional[Entrevista] = obj.entrevistas.last()
 
         if not entrevista:
             return 'Sin entrevista programada'
@@ -139,10 +141,11 @@ class AccesoTestPersonaInline(admin.TabularInline):
         if entrevista.fecha_fin < make_aware(datetime.now(), timezone=TZ_CHILE):
             return 'Entrevista fuera de plazo'
 
-        dia = weekday_to_str[entrevista.fecha.weekday()]
-        mes = month_to_str[entrevista.fecha.month]
-        fecha = f'{entrevista.fecha.day} de {mes}'
-        hora = entrevista.fecha.strftime('%H:%M')
+        local_fecha_inicio = timezone.localtime(entrevista.fecha)
+        dia = weekday_to_str[local_fecha_inicio.weekday()]
+        mes = month_to_str[local_fecha_inicio.month]
+        fecha = f'{local_fecha_inicio.day} de {mes}'
+        hora = local_fecha_inicio.strftime('%H:%M')
 
         return link_whatsapp(
             obj.persona,

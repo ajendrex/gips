@@ -2,8 +2,7 @@ import json
 
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.humanize.templatetags import humanize
-from django.contrib.humanize.templatetags.humanize import naturaltime, naturalday
+from django.contrib.humanize.templatetags.humanize import naturalday
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, reverse
 from django.utils import timezone
