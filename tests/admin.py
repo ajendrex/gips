@@ -146,7 +146,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
 
         return link_whatsapp(
             obj.persona,
-            f'¡Hola {obj.persona}!\n\n'
+            f'¡Hola {obj.persona.nombres}!\n\n'
             'Tu entrevista psicológica está confirmada. '
             f'Nos vemos el día {dia} {fecha} a las {hora} hrs a través de video llamada.\n\n'
             'Antes de la hora programada, un miembro de nuestro equipo de psicólogos se pondrá en contacto '
