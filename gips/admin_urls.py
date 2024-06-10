@@ -14,17 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path, include, re_path
-
-from entrevistas.views import serve_protected_media, verificar
-from gips.views import FrontendAppView, ManifestView
+from django.contrib import admin
+from django.urls import path
 
 urlpatterns = [
-    path("informes/", include("informes.urls")),
-    path(r'verificar/<str:clave_acceso>', verificar, name='verificar'),
-    path("api/tests/", include("tests.urls")),
-    path("api/entrevistas/", include("entrevistas.urls")),
-    re_path(r'^media/(?P<path>.*)$', serve_protected_media),
-    re_path(r'^tests/.*$', FrontendAppView.as_view(), name='tests'),
-    re_path(r'^manifest.json$', ManifestView.as_view(), name='manifest'),
+    path("", admin.site.urls),
 ]

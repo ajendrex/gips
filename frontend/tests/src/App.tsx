@@ -11,7 +11,7 @@ const App: React.FC = () => {
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
                 <ChakraBaseProvider theme={theme}>
-                    <Router>
+                    <Router basename="/tests/">
                         <Routes>
                             <Route path="/" element={<TestPage/>}/>
                         </Routes>

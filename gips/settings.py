@@ -55,13 +55,18 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django_hosts.middleware.HostsRequestMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django_hosts.middleware.HostsResponseMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
 ]
+
+ROOT_HOSTCONF = 'gips.hosts'  # Asume que creas un archivo hosts.py en el directorio principal de tu proyecto
+DEFAULT_HOST = ''  # Host por defecto
 
 ROOT_URLCONF = "gips.urls"
 

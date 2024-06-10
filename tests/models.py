@@ -1,11 +1,14 @@
 from datetime import datetime
 from typing import Dict, Set
+from urllib.parse import urlencode
 
 import reversion
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import make_aware
 from django_countries.fields import CountryField
+from django_hosts import reverse
 from rut_chile import rut_chile
 
 from utils.fechas import TZ_CHILE
@@ -217,6 +220,13 @@ class AccesoTestPersona(models.Model):
     @property
     def test(self) -> Test:
         return self.acceso_test.test
+
+    @property
+    def url(self) -> str:
+        base_url = settings.BASE_URL + '/' + reverse('tests', host='')
+        query_params = {'codigo': self.codigo}
+        url_with_query_params = f"{base_url}?{urlencode(query_params)}"
+        return url_with_query_params
 
 
 class Resultado(models.Model):

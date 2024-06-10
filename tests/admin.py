@@ -91,9 +91,9 @@ class AccesoTestPersonaInline(admin.TabularInline):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def url(self, obj):
+    def url(self, obj: AccesoTestPersona):
         return format_html('<a href="{}" target="blank"><img src="{}" style="width: 20px" alt="Visit"/></a>',
-                           f'/?codigo={obj.codigo}',
+                           obj.url,
                            '/static/admin/img/icon-viewlink.svg')
     url.short_description = 'Acceder al test'
 

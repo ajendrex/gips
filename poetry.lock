@@ -444,6 +444,17 @@ pyuca = ["pyuca"]
 test = ["djangorestframework", "graphene-django", "pytest", "pytest-cov", "pytest-django"]
 
 [[package]]
+name = "django-hosts"
+version = "6.0"
+description = "Dynamic and static host resolving for Django. Maps hostnames to URLconfs."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django-hosts-6.0.tar.gz", hash = "sha256:e7aec357504d36f384c65fba67deabc4552f36f347b96bb7a3d131a1250d7299"},
+    {file = "django_hosts-6.0-py3-none-any.whl", hash = "sha256:34a97a183b3fb8a00de3e0a8af5355a25ff5203019d2e213edd8f12c330cc303"},
+]
+
+[[package]]
 name = "django-json-widget"
 version = "1.1.1"
 description = "Django json widget is an alternative widget that makes it easy to edit the jsonfield field of django."
@@ -1213,4 +1224,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "aac4b2bee5c82372c543635f937359470e27b58f7982fda7fbc7f67423eeb193"
+content-hash = "f62576f351734bae5b1b3836d5d9a4414b5c5be206388d5a31fd27135eaf8a8d"
