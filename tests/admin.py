@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -86,7 +87,6 @@ class TestAdmin(admin.ModelAdmin):
 class AccesoTestPersonaInline(admin.TabularInline):
     model = AccesoTestPersona
     extra = 0
-    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'presentacion_whatsapp', 'confirmacion_whatsapp')
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -172,6 +172,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
 
 class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos sin entrevista"
+    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'presentacion_whatsapp')
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -180,10 +181,22 @@ class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
 
 class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos con entrevista"
+    readonly_fields = (
+        'inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'link_entrevista', 'confirmacion_whatsapp',
+    )
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.filter(entrevistas__isnull=False).distinct()
+
+    def link_entrevista(self, obj: AccesoTestPersona) -> str:
+        entrevista = obj.entrevistas.last()
+        if entrevista:
+            return format_html(
+                '<a href="{}"><img src="/static/admin/img/icon-changelink.svg" alt="Ver"></a>',
+                reverse('admin:entrevistas_entrevista_change', args=[entrevista.pk]),
+            )
+        return ""
 
 
 @admin.register(AccesoTest)
