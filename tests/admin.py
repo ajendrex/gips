@@ -228,7 +228,7 @@ class RespuestaLikertNOASInline(admin.TabularInline):
 
 @admin.register(Resultado)
 class ResultadoAdmin(admin.ModelAdmin):
-    list_display = ('persona', 'test', 'fecha_creacion')
+    list_display = ('persona', 'test', 'fecha_emision', 'resultado_test')
     search_fields = (
         'acceso__persona__nombres',
         'acceso__persona__apellido_paterno',
@@ -240,7 +240,8 @@ class ResultadoAdmin(admin.ModelAdmin):
     readonly_fields = (
         'persona',
         'test',
-        'fecha_creacion',
+        'fecha_emision',
+        'resultado_test',
         'evaluacion_pretty',
         'informe',
         'clave_archivo',
@@ -250,7 +251,7 @@ class ResultadoAdmin(admin.ModelAdmin):
     inlines = [RespuestaLikertNOASInline]
     fieldsets = (
         (None, {
-            'fields': (('persona', 'fecha_creacion'),)
+            'fields': (('persona', 'fecha_emision', 'resultado_test'),)
         }),
         ('Evaluación', {
             'fields': ('test', 'inicio_test', 'fin_test', 'informe', 'clave_archivo', 'evaluacion_pretty'),

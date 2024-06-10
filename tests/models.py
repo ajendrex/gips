@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Dict, Set
+from datetime import datetime, date, timedelta
+from typing import Dict, Set, Optional
 from urllib.parse import urlencode
 
 import reversion
@@ -234,7 +234,9 @@ class Resultado(models.Model):
     fecha_creacion = models.DateTimeField("fecha de creación", auto_now_add=True)
     clave_archivo = models.CharField(max_length=20, blank=True, default="")
     evaluacion = models.JSONField(default=dict)
+    resultado_test = models.ForeignKey(ResultadoEvaluacion, on_delete=models.RESTRICT, null=True)
     informe = models.FileField(upload_to='resultados/%Y/%m/%d/', null=True)
+    fecha_emision = models.DateField(null=True)
 
     def __str__(self):
         return f"{self.persona} - {self.test} - {self.fecha_creacion.date()}"
@@ -250,6 +252,31 @@ class Resultado(models.Model):
     @property
     def codigo_acceso(self) -> str:
         return self.acceso.codigo
+
+    @property
+    def fecha_vencimiento(self) -> date:
+        return self.fecha_emision + timedelta(days=90)
+
+    def save(self, *args, **kwargs):
+        if self._informe_ha_cambiado():
+            self.fecha_emision = datetime.now().date()
+        super().save(*args, **kwargs)
+
+    def _informe_ha_cambiado(self) -> bool:
+        if self.pk:
+            original = Resultado.objects.get(pk=self.pk)
+            return original.informe and self.informe != original.informe
+        else:
+            return bool(self.informe)
+
+    @property
+    def resultado(self) -> str:
+        from entrevistas.models import Entrevista
+        entrevista: Optional[Entrevista] = self.acceso.entrevistas.last()
+
+        resultado_entrevista = entrevista and entrevista.resultado_entrevista
+
+        return (resultado_entrevista or self.resultado_test).nombre
 
 
 class RespuestaBase(models.Model):

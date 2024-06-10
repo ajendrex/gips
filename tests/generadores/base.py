@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Tuple
 
 import qrcode
 from django.conf import settings
@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpRequest
 
 from informes.gips_service import GIPSService
-from tests.models import Resultado, AccesoTestPersona
+from tests.models import Resultado, AccesoTestPersona, ResultadoEvaluacion
 from utils.text import numerico_random
 
 LONGITUD_CLAVE_ARCHIVO = 5
@@ -65,7 +65,7 @@ class Generador(ABC, GIPSService):
 
     @staticmethod
     def _generar_qr(codigo: str) -> bytes:
-        url = f"{settings.BASE_URL}/api/entrevistas/verificar/{codigo}"
+        url = f"{settings.BASE_URL}/verificar/{codigo}"
         return qrcode.make(
             url,
             version=1,
@@ -77,7 +77,9 @@ class Generador(ABC, GIPSService):
     def evaluar(self):
         try:
             if self.is_valid(raise_exception=True):
-                self.resultado.evaluacion = self._evaluar()
+                evaluacion, resultado_evaluacion = self._evaluar()
+                self.resultado.evaluacion = evaluacion
+                self.resultado.resultado_test = resultado_evaluacion
         except Exception as e:
             self._add_error_message(f"Error al evaluar resultado: {e}")
         else:
@@ -107,7 +109,7 @@ class Generador(ABC, GIPSService):
         ...
 
     @abstractmethod
-    def _evaluar(self) -> dict:
+    def _evaluar(self) -> Tuple[dict, ResultadoEvaluacion]:
         ...
 
     @abstractmethod

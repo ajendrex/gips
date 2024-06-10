@@ -8,7 +8,7 @@ from rut_chile import rut_chile
 from weasyprint import HTML
 
 from tests.generadores.base import Generador
-from tests.models import Gentilicio
+from tests.models import Gentilicio, ResultadoEvaluacion
 
 
 class GeneradorPuntajeEscala(Generador):
@@ -94,7 +94,14 @@ class GeneradorPuntajeEscala(Generador):
 
         evaluacion["puntajes"] = puntajes
 
-        return evaluacion
+        nombre_resultado = (
+            "APTO" if puntajes["GENERAL"]["nivel"] == "BAJO"
+            else "CON_RESERVAS" if puntajes["GENERAL"]["nivel"] == "MODERADO"
+            else "NO_APTO"
+        )
+        resultado_evaluacion = self.resultado.test.resultados_posibles.get(nombre=nombre_resultado)
+
+        return evaluacion, resultado_evaluacion
 
     def _generar_informe(self, qr_image: PilImage) -> bytes:
         output = BytesIO()

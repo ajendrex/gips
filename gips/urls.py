@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.urls import path, include, re_path
 
-from entrevistas.views import serve_protected_media, verificar
+from entrevistas.views import verificar
 from gips.views import FrontendAppView, ManifestView
 
 urlpatterns = [
@@ -24,7 +24,6 @@ urlpatterns = [
     path(r'verificar/<str:clave_acceso>', verificar, name='verificar'),
     path("api/tests/", include("tests.urls")),
     path("api/entrevistas/", include("entrevistas.urls")),
-    re_path(r'^media/(?P<path>.*)$', serve_protected_media),
     re_path(r'^tests/.*$', FrontendAppView.as_view(), name='tests'),
     re_path(r'^manifest.json$', ManifestView.as_view(), name='manifest'),
 ]
