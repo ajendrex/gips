@@ -223,7 +223,7 @@ class AccesoTestPersona(models.Model):
 
     @property
     def url(self) -> str:
-        base_url = settings.BASE_URL + '/' + reverse('tests', host='')
+        base_url = settings.BASE_URL + reverse('tests', host='').replace("///", "/")
         query_params = {'codigo': self.codigo}
         url_with_query_params = f"{base_url}?{urlencode(query_params)}"
         return url_with_query_params
