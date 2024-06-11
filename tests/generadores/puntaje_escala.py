@@ -107,6 +107,13 @@ class GeneradorPuntajeEscala(Generador):
         output = BytesIO()
         qr_image.save(output, format="PNG")
         qr_image_uri = base64.b64encode(output.getvalue()).decode('ascii')
+
+        html = self._generar_html_informe(qr_image_uri)
+
+        if settings.DEBUG:
+            with open("informe.html", "w") as file:
+                file.write(html)
+
         return HTML(string=self._generar_html_informe(qr_image_uri), base_url=settings.BASE_DIR).write_pdf()
 
     def _generar_html_informe(self, qr_image_uri: str) -> str:
@@ -118,7 +125,7 @@ class GeneradorPuntajeEscala(Generador):
                   <head>{self._estilos()}</head>
                   <body>
                     <h1>CERTIFICADO</h1>
-                    <h2>EVALUACIÓN PSICOLÓGICA<br>DEL CONTROL DE LOS IMPULSOS</h2>
+                    <h2>EVALUACIÓN PSICOLÓGICA DEL CONTROL DE LOS IMPULSOS</h2>
                     {self.generar_html_evaluacion()}
                     <div class="box-firma">
                       <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
@@ -130,16 +137,14 @@ class GeneradorPuntajeEscala(Generador):
                             <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
                         </div>
                         <div class="column content-column">
-                            <div>
-                                Para verificar la autenticidad<br>
-                                escanee el código QR o visite<br>
-                                <a
-                                 href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
-                                 >
-                                    {domain}/verificar/{self.resultado.acceso.codigo}
-                                </a><br>
-                                e ingrese el código <b>{self.resultado.clave_archivo}</b>
-                            </div>
+                            Para verificar la autenticidad<br>
+                            escanee el código QR o visite<br>
+                            <a
+                             href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
+                             >
+                                {domain}/verificar/{self.resultado.acceso.codigo}
+                            </a><br>
+                            e ingrese el código <b>{self.resultado.clave_archivo}</b>
                         </div>
                     </div>
                   </body>
@@ -193,11 +198,14 @@ class GeneradorPuntajeEscala(Generador):
                 size: A4; /* Change from the default size of A4 */
                 margin: 20mm; /* Set margin on each page */
             }
+            body {
+                font-size: 14px;
+            }
             h1 {
-                font-size: 24px;
+                font-size: 20px;
             }
             h2 {
-                font-size: 20px;
+                font-size: 18px;
             }
             h1, h2 {
                 text-align: center;
@@ -210,8 +218,8 @@ class GeneradorPuntajeEscala(Generador):
                 margin: 10px 0 10px 0;
             }
             .firma-img {
-                width: 200px;
-                height: auto;
+                height: 150px;
+                width: auto;
                 display: block;
                 margin: auto;
             }
@@ -222,28 +230,25 @@ class GeneradorPuntajeEscala(Generador):
             .box-firma p {
                 text-align: center;
             }
+            
             .verification {
-                display: flex;  /* Activa Flexbox */
-                width: 100%;    /* Establece el ancho del contenedor al 100% */
-                margin-top: -80px;
+                font-size: 0;
+                margin-top: -60px;
             }
             
             .column {
-                flex-shrink: 0; /* Evita que la columna se reduzca más pequeña que su contenido */
+                font-size: 14px;
+                display: inline-block;
+                vertical-align: bottom;
             }
             
             .image-column {
-                flex-basis: auto; /* Tamaño basado en el contenido de la columna (la imagen) */
+                width: 30%;
             }
             
             .content-column {
-                flex-grow: 1;    /* Permite que esta columna crezca y ocupe el espacio restante */
-                align-content: end;  /* Alinea el contenido al final de la columna */
-                text-align: right;  /* Alinea el texto a la derecha */
-                padding-top: 90px;
-                overflow-wrap: break-word;  /* Asegura que las palabras largas se rompan para evitar desbordamiento */
-                word-wrap: break-word;      /* Asegura que las palabras largas se rompan para evitar desbordamiento */
-                overflow: hidden;           /* Oculta cualquier contenido que se desborde del contenedor */
+                text-align: right;
+                width: 70%;
             }
         </style>
         """
