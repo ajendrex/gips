@@ -111,19 +111,22 @@ const TestPage: React.FC = () => {
         }
     )
 
+    const outterPadding = 20
+    const marginTop = 20
+
     return (
         <Box
             display="flex"
             justifyContent="center"
             alignItems={itemsAlignment}
-            p="20px"
-            mt="20px"
+            p={`${outterPadding}px`}
+            mt={`${marginTop}px`}
             alignContent={itemsAlignment}
         >
             <Box width="100%" maxW="500px">
                 {mostrarLogo && (
                     <Box display="flex" justifyContent="center">
-                        <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' mb="80px" width="xs" />
+                        <Image src='/static/images/psicologico_ISOLOGO.svg' alt='logo_el_psicologico' mb="40px" width="3xs" />
                     </Box>
                 )}
                 {isLoading ? (
@@ -163,12 +166,14 @@ const TestPage: React.FC = () => {
                         successCallback={() => finishTest.mutate()}
                         terminar={terminar}
                         error={finishTest.error ? "Ocurrió un error inesperado, por favor intenta de nuevo." : null}
+                        parentHeight={outterPadding * 2 + marginTop}
+                        parentHeightTop={outterPadding + marginTop}
                     />
                 ) : (
                     <Card p="10px">
                         <Stack spacing="15px">
                             <Box mb="30px">
-                                <Heading size="lg" textAlign="center">Test de control de los impulsos</Heading>
+                                <Heading size="md" textAlign="center">Test de control de los impulsos</Heading>
                             </Box>
                             <Text>Hola!</Text>
                             <Text>Bienvenido(a) a esta evaluación online.</Text>
