@@ -276,7 +276,7 @@ class Resultado(models.Model):
 
         resultado_entrevista = entrevista and entrevista.resultado_entrevista
 
-        return (resultado_entrevista or self.resultado_test).nombre
+        return (resultado_entrevista or self.resultado_test).texto
 
 
 class RespuestaBase(models.Model):

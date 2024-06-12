@@ -169,6 +169,14 @@ class AccesoTestPersonaInline(admin.TabularInline):
             formset.form.base_fields['cargo'].initial = obj.cargo_predefinido
         return formset
 
+    def link_entrevista(self, obj: AccesoTestPersona) -> str:
+        entrevista = obj.entrevistas.last()
+        if entrevista:
+            return format_html(
+                '<a href="{}"><img src="/static/admin/img/icon-changelink.svg" alt="Ver"></a>',
+                reverse('admin:entrevistas_entrevista_change', args=[entrevista.pk]),
+            )
+        return ""
 
 class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos sin entrevista"
@@ -187,16 +195,42 @@ class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        return queryset.filter(entrevistas__isnull=False).distinct()
+        return queryset.filter(
+            entrevistas__isnull=False,
+            entrevistas__resultado__informe__isnull=True,
+        ).distinct()
 
-    def link_entrevista(self, obj: AccesoTestPersona) -> str:
+
+class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
+    verbose_name_plural = "Accesos con informe"
+    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'link_entrevista', 'cierre_whatsapp')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(entrevistas__resultado__informe__isnull=False).distinct()
+
+    def cierre_whatsapp(self, obj: AccesoTestPersona) -> str:
         entrevista = obj.entrevistas.last()
+        resultado = obj.resultado
+        fv = obj.resultado.fecha_vencimiento
+        fecha_vencimiento = f'{fv.day} de {month_to_str[fv.month]} de {fv.year}'
+
         if entrevista:
-            return format_html(
-                '<a href="{}"><img src="/static/admin/img/icon-changelink.svg" alt="Ver"></a>',
-                reverse('admin:entrevistas_entrevista_change', args=[entrevista.pk]),
+            return link_whatsapp(
+                obj.persona,
+                f'Hola {obj.persona.nombres},\n\n'
+                'Hemos enviado tu informe de control de impulsos a '
+                f'{obj.acceso_test.mandante} vía email. El resultado de tu evaluación es: {resultado.resultado} '
+                f'para realizar labores de {obj.get_cargo_display()}.\n\n'
+                'El informe tiene una vigencia de 90 días desde la fecha de emisión, es decir, será válido hasta el '
+                f'{fecha_vencimiento}.\n\n'
+                'Si tienes alguna pregunta o necesitas más información, no dudes en contactarnos.\n\n'
+                'Saludos,\n'
+                'El equipo de El Sicológico',
+                'Abrir Cierre en Whatsapp',
             )
         return ""
+    cierre_whatsapp.short_description = "Cierre de Entrevista"
 
 
 @admin.register(AccesoTest)
@@ -205,7 +239,7 @@ class AccesoTestAdmin(admin.ModelAdmin):
     search_fields = ('test__nombre', 'mandante__nombres', 'mandante__apellido_paterno', 'mandante__apellido_materno')
     date_hierarchy = 'fecha_creacion'
     list_filter = ('test', 'mandante__es_natural')
-    inlines = [AccesoTestPersonaConEntrevista, AccesoTestPersonaSinEntrevista]
+    inlines = [AccesoTestPersonaConEntrevista, AccesoTestPersonaSinEntrevista, AccesoTestPersonaConInforme]
 
     @staticmethod
     def cant_evaluaciones(obj: AccesoTest):
