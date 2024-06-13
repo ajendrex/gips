@@ -121,7 +121,7 @@ class AccesoTestPersonaInline(admin.TabularInline):
                 '-	En la segunda tendrás una entrevista psicológica por video llamada de WhatsApp.\n\n'
                 'Si tienes dudas o algún problema, avísanos por este chat.\n\n'
                 'Cuando estés listo/a, toca el siguiente enlace para empezar el test:\n'
-                f'{settings.BASE_URL}/?codigo={obj.codigo}\n\n'
+                f'{obj.url}\n\n'
                 'Cuando lo termines, elige el día y la hora que te acomoden para realizar la entrevista.\n\n'
                 'Te Saluda,\n'
                 '*Equipo El sicológico*\n'
@@ -178,6 +178,10 @@ class AccesoTestPersonaInline(admin.TabularInline):
             )
         return ""
 
+    def has_add_permission(self, request, obj):
+        return False
+
+
 class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos sin entrevista"
     readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'presentacion_whatsapp')
@@ -185,6 +189,9 @@ class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.filter(entrevistas__isnull=True)
+
+    def has_add_permission(self, request, obj):
+        return True
 
 
 class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
@@ -195,10 +202,7 @@ class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        return queryset.filter(
-            entrevistas__isnull=False,
-            entrevistas__resultado__informe__isnull=True,
-        ).distinct()
+        return queryset.filter(entrevistas__resultado__informe="").distinct()
 
 
 class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
@@ -207,13 +211,13 @@ class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        return queryset.filter(entrevistas__resultado__informe__isnull=False).distinct()
+        return queryset.filter(entrevistas__isnull=False).exclude(entrevistas__resultado__informe="").distinct()
 
     def cierre_whatsapp(self, obj: AccesoTestPersona) -> str:
         entrevista = obj.entrevistas.last()
         resultado = obj.resultado
         fv = obj.resultado.fecha_vencimiento
-        fecha_vencimiento = f'{fv.day} de {month_to_str[fv.month]} de {fv.year}'
+        fecha_vencimiento = f'{fv.day} de {month_to_str[fv.month]} de {fv.year}' if fv else "indefinida"
 
         if entrevista:
             return link_whatsapp(

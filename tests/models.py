@@ -254,8 +254,8 @@ class Resultado(models.Model):
         return self.acceso.codigo
 
     @property
-    def fecha_vencimiento(self) -> date:
-        return self.fecha_emision + timedelta(days=90)
+    def fecha_vencimiento(self) -> Optional[date]:
+        return self.fecha_emision + timedelta(days=90) if self.fecha_emision else None
 
     def save(self, *args, **kwargs):
         if self._informe_ha_cambiado():
