@@ -113,20 +113,24 @@ class AccesoTestPersonaInline(admin.TabularInline):
         return link_whatsapp(
             persona,
             f'*¡Hola {persona}!* Esperamos que estés bien. Somos *El Sicológico*, especialistas '
-                'en evaluaciones psicológicas en linea.\n\n'
-                f'*{empresa}* nos solicitó evaluar tus impulsos para tu acreditación como '
-                f'personal de seguridad.\n\n'
-                'Te evaluaremos en 2 etapas:\n'
-                '-	En la primera contestarás un test online.\n'
-                '-	En la segunda tendrás una entrevista psicológica por video llamada de WhatsApp.\n\n'
-                'Si tienes dudas o algún problema, avísanos por este chat.\n\n'
-                'Cuando estés listo/a, toca el siguiente enlace para empezar el test:\n'
-                f'{obj.url}\n\n'
-                'Cuando lo termines, elige el día y la hora que te acomoden para realizar la entrevista.\n\n'
-                'Te Saluda,\n'
-                '*Equipo El sicológico*\n'
-                'www.elsicologico.cl',
-            'Abrir Presentación en Whatsapp',
+            'en evaluaciones psicológicas en linea.\n\n' +
+            (
+                'Nos solicitaste'
+                if empresa.rut == persona.rut
+                else f'*{empresa}* nos solicitó'
+            ) +
+            ' evaluar tus impulsos para tu acreditación como personal de seguridad.\n\n'
+            'Te evaluaremos en 2 etapas:\n'
+            '-	En la primera contestarás un test online.\n'
+            '-	En la segunda tendrás una entrevista psicológica por video llamada de WhatsApp.\n\n'
+            'Si tienes dudas o algún problema, avísanos por este chat.\n\n'
+            'Cuando estés listo/a, toca el siguiente enlace para empezar el test:\n'
+            f'{obj.url}\n\n'
+            'Cuando lo termines, elige el día y la hora que te acomoden para realizar la entrevista.\n\n'
+            'Te Saluda,\n'
+            '*Equipo El sicológico*\n'
+            'www.elsicologico.cl',
+        'Abrir Presentación en Whatsapp',
         )
     presentacion_whatsapp.short_description = 'Mensaje Inicial'
 
@@ -220,11 +224,17 @@ class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
         fecha_vencimiento = f'{fv.day} de {month_to_str[fv.month]} de {fv.year}' if fv else "indefinida"
 
         if entrevista:
+            empresa = obj.acceso_test.mandante
+            persona = obj.persona
+
             return link_whatsapp(
-                obj.persona,
+                persona,
                 f'Hola {obj.persona.nombres},\n\n'
-                'Hemos enviado tu informe de control de impulsos a '
-                f'{obj.acceso_test.mandante} vía email. El resultado de tu evaluación es: {resultado.resultado} '
+                f'{"Te hemos" if empresa.rut == persona.rut else "Hemos"} enviado tu informe de control de impulsos' +
+                (
+                    f' a {obj.acceso_test.mandante} vía email'
+                ) +
+                f'. El resultado de tu evaluación es: {resultado.resultado} '
                 f'para realizar labores de {obj.get_cargo_display()}.\n\n'
                 'El informe tiene una vigencia de 90 días desde la fecha de emisión, es decir, será válido hasta el '
                 f'{fecha_vencimiento}.\n\n'
@@ -243,7 +253,7 @@ class AccesoTestAdmin(admin.ModelAdmin):
     search_fields = ('test__nombre', 'mandante__nombres', 'mandante__apellido_paterno', 'mandante__apellido_materno')
     date_hierarchy = 'fecha_creacion'
     list_filter = ('test', 'mandante__es_natural')
-    inlines = [AccesoTestPersonaConEntrevista, AccesoTestPersonaSinEntrevista, AccesoTestPersonaConInforme]
+    inlines = [AccesoTestPersonaSinEntrevista, AccesoTestPersonaConEntrevista, AccesoTestPersonaConInforme]
 
     @staticmethod
     def cant_evaluaciones(obj: AccesoTest):
