@@ -201,7 +201,7 @@ class AccesoTestPersonaSinEntrevista(AccesoTestPersonaInline):
 class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos con entrevista"
     readonly_fields = (
-        'inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'link_entrevista', 'confirmacion_whatsapp',
+        'inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'link_entrevista', 'confirmacion_whatsapp',
     )
 
     def get_queryset(self, request):
@@ -211,7 +211,7 @@ class AccesoTestPersonaConEntrevista(AccesoTestPersonaInline):
 
 class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
     verbose_name_plural = "Accesos con informe"
-    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'url', 'link_entrevista', 'cierre_whatsapp')
+    readonly_fields = ('inicio_respuestas_ts', 'fin_respuestas_ts', 'codigo', 'link_entrevista', 'cierre_whatsapp')
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

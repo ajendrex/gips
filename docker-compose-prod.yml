@@ -31,7 +31,8 @@ services:
         networks:
             - app_net
         volumes:
-           - ./shared:/app/shared
+            - ./shared:/app/shared
+            - /media:/app/media
 
 
 networks:

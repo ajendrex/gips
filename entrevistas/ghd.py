@@ -175,7 +175,7 @@ class HorarioGlobal:
                     horario_global.append(bloque)
                 bloque = BloqueHorario(min, min)
 
-        if bloque.fin - bloque.inicio >= timedelta(minutes=15):
+        if bloque and bloque.fin - bloque.inicio >= timedelta(minutes=15):
             horario_global.append(bloque)
 
         return horario_global

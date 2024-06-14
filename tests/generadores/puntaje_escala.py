@@ -8,7 +8,7 @@ from rut_chile import rut_chile
 from weasyprint import HTML
 
 from tests.generadores.base import Generador
-from tests.models import Gentilicio, ResultadoEvaluacion
+from tests.models import Gentilicio
 
 
 class GeneradorPuntajeEscala(Generador):
@@ -124,8 +124,7 @@ class GeneradorPuntajeEscala(Generador):
                 <html>
                   <head>{self._estilos()}</head>
                   <body>
-                    <h1>CERTIFICADO</h1>
-                    <h2>EVALUACIÓN PSICOLÓGICA DEL CONTROL DE LOS IMPULSOS</h2>
+                    <h1>CERTIFICADO EVALUACIÓN PSICOLÓGICA<br />CONTROL DE LOS IMPULSOS</h1>
                     {self.generar_html_evaluacion()}
                     <div class="box-firma">
                       <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
@@ -133,18 +132,19 @@ class GeneradorPuntajeEscala(Generador):
                       <p>{sicologo}<br>Psicólogo<br><span>N° Reg: {sicologo.nro_registro}</span></p>
                     </div>
                     <div class="verification">
+                        <hr>
                         <div class="column image-column">
                             <img src="data:image/png;base64,{qr_image_uri}" alt="Código QR">
                         </div>
                         <div class="column content-column">
-                            Para verificar la autenticidad<br>
-                            escanee el código QR o visite<br>
+                            Para verificar la autenticidad escanee el código QR o visite<br>
                             <a
                              href="{settings.BASE_URL}/verificar/{self.resultado.acceso.codigo}"
                              >
                                 {domain}/verificar/{self.resultado.acceso.codigo}
-                            </a><br>
-                            e ingrese el código <b>{self.resultado.clave_archivo}</b>
+                            </a> e ingrese el código <b>{self.resultado.clave_archivo}</b><br>
+                            Este documento fue emitido el {self.resultado.fecha_emision.strftime("%d/%m/%Y")} y caducará
+                            el {self.resultado.fecha_vencimiento.strftime("%d/%m/%Y")}
                         </div>
                     </div>
                   </body>
@@ -195,19 +195,17 @@ class GeneradorPuntajeEscala(Generador):
         return """
         <style>
             @page {
-                size: A4; /* Change from the default size of A4 */
+                size: Letter;
                 margin: 20mm; /* Set margin on each page */
+                margin-top: 12mm;
+                margin-bottom: 12mm;
             }
             body {
-                font-size: 14px;
+                font-size: 13px;
+                font-family: 'DejaVu Serif', serif;
             }
             h1 {
-                font-size: 20px;
-            }
-            h2 {
                 font-size: 18px;
-            }
-            h1, h2 {
                 text-align: center;
             }
             p {
@@ -233,22 +231,25 @@ class GeneradorPuntajeEscala(Generador):
             
             .verification {
                 font-size: 0;
-                margin-top: -60px;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
             }
             
             .column {
-                font-size: 14px;
+                font-size: 12px;
                 display: inline-block;
                 vertical-align: bottom;
+                margin-top: 10px;
             }
             
             .image-column {
-                width: 30%;
+                width: 20%;
             }
             
             .content-column {
                 text-align: right;
-                width: 70%;
+                width: 80%;
             }
         </style>
         """

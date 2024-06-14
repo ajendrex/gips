@@ -70,7 +70,7 @@ class Generador(ABC, GIPSService):
             url,
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=4,
+            box_size=2,
             border=0,
         )
 

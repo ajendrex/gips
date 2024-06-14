@@ -23,8 +23,6 @@ services:
             - SECRET_KEY
             - ALLOWED_HOSTS
             - CSRF_TRUSTED_ORIGINS
-        volumes:
-            - /media:/app/media
 
     static:
         build:
