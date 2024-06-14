@@ -229,10 +229,12 @@ class AccesoTestPersonaConInforme(AccesoTestPersonaInline):
 
             return link_whatsapp(
                 persona,
-                f'Hola {obj.persona.nombres},\n\n'
+                f'{obj.persona.nombres},\n\n'
                 f'{"Te hemos" if empresa.rut == persona.rut else "Hemos"} enviado tu informe de control de impulsos' +
                 (
-                    f' a {obj.acceso_test.mandante} vía email'
+                    f'a {obj.acceso_test.mandante}'
+                    if persona.rut != empresa.rut
+                    else ''
                 ) +
                 f'. El resultado de tu evaluación es: {resultado.resultado} '
                 f'para realizar labores de {obj.get_cargo_display()}.\n\n'
