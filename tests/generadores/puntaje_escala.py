@@ -125,7 +125,9 @@ class GeneradorPuntajeEscala(Generador):
                   <head>{self._estilos()}</head>
                   <body>
                     <h1>CERTIFICADO EVALUACIÓN PSICOLÓGICA<br />CONTROL DE LOS IMPULSOS</h1>
-                    {self.generar_html_evaluacion()}
+                    <div class="informe">
+                        {self.generar_html_evaluacion()}
+                    </div>
                     <div class="box-firma">
                       <img src="{sicologo.firma.path}" alt="Firma {sicologo}" class="firma-img" />
                       <hr>
@@ -215,6 +217,11 @@ class GeneradorPuntajeEscala(Generador):
                 text-align: justify;
                 margin: 10px 0 10px 0;
             }
+            
+            .informe {
+                margin: 20px 0 20px 0;
+            }
+            
             .firma-img {
                 height: 150px;
                 width: auto;
