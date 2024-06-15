@@ -8,8 +8,8 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.http import HttpRequest
 
-from informes.gips_service import GIPSService
-from tests.models import Resultado, AccesoTestPersona, ResultadoEvaluacion
+from tests.gips_service import GIPSService
+from tests.models import Resultado, ResultadoEvaluacion
 from utils.text import numerico_random
 
 LONGITUD_CLAVE_ARCHIVO = 5

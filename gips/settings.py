@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "django_json_widget",
     "tests",
     "entrevistas",
-    "informes",
 ]
 
 

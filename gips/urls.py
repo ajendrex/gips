@@ -20,7 +20,6 @@ from entrevistas.views import verificar
 from gips.views import FrontendAppView, ManifestView
 
 urlpatterns = [
-    path("informes/", include("informes.urls")),
     path(r'verificar/<str:clave_acceso>', verificar, name='verificar'),
     path("api/tests/", include("tests.urls")),
     path("api/entrevistas/", include("entrevistas.urls")),
