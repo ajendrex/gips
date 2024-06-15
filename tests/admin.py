@@ -311,6 +311,7 @@ class ResultadoAdmin(admin.ModelAdmin):
             return (
                 'persona',
                 'test',
+                'cerrado',
                 'fecha_emision',
                 'resultado_test',
                 'evaluacion_pretty',
