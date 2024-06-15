@@ -290,23 +290,37 @@ class ResultadoAdmin(admin.ModelAdmin):
     readonly_fields = (
         'persona',
         'test',
-        'fecha_emision',
         'resultado_test',
         'evaluacion_pretty',
         'informe',
-        'clave_archivo',
         'inicio_test',
         'fin_test',
     )
     inlines = [RespuestaLikertNOASInline]
     fieldsets = (
         (None, {
-            'fields': (('persona', 'fecha_emision', 'resultado_test'),)
+            'fields': (('persona', 'fecha_emision', 'resultado_test', 'cerrado'),)
         }),
         ('Evaluación', {
             'fields': ('test', 'inicio_test', 'fin_test', 'informe', 'clave_archivo', 'evaluacion_pretty'),
         }),
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return (
+                'persona',
+                'test',
+                'fecha_emision',
+                'resultado_test',
+                'evaluacion_pretty',
+                'informe',
+                'clave_archivo',
+                'inicio_test',
+                'fin_test',
+            )
+
+        return super().get_readonly_fields(request, obj)
 
     def inicio_test(self, instance: Resultado) -> Optional[datetime]:
         return instance.acceso.inicio_respuestas_ts

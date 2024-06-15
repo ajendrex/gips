@@ -10,6 +10,11 @@ class EntrevistaForm(forms.ModelForm):
         label="Sicólogo",
         help_text="Seleccione un sicólogo para realizar la entrevista."
     )
+    cerrar_evaluacion = forms.BooleanField(
+        required=False,
+        label="Cerrar evaluación",
+        help_text="Marque esta casilla si desea cerrar la evaluación después de realizar la entrevista."
+    )
 
     class Meta:
         model = Entrevista
@@ -27,3 +32,14 @@ class EntrevistaForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+    def clean(self):
+        cleaned_data = super().clean()
+        resultado = self.instance.resultado
+
+        if cleaned_data.get('cerrar_evaluacion') and not resultado.informe:
+            msg = "No se puede cerrar la evaluación sin haber generado el informe."
+            self.add_error("cerrar_evaluacion", msg)
+            raise forms.ValidationError(msg)
+
+        return cleaned_data

@@ -237,6 +237,7 @@ class Resultado(models.Model):
     resultado_test = models.ForeignKey(ResultadoEvaluacion, on_delete=models.RESTRICT, null=True)
     informe = models.FileField(upload_to='resultados/%Y/%m/%d/', null=True)
     fecha_emision = models.DateField(null=True)
+    cerrado = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.persona} - {self.test} - {self.fecha_creacion.date()}"

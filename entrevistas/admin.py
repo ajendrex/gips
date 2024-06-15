@@ -91,6 +91,12 @@ class EntrevistaAdmin(admin.ModelAdmin):
                 ),
             },
         ),
+        (
+            "Zona Peligrosa!",
+            {
+                "fields": ("cerrar_evaluacion",),
+            }
+        )
     )
 
     def presentacion_whatsapp(self, obj: Entrevista) -> str:
@@ -128,6 +134,14 @@ class EntrevistaAdmin(admin.ModelAdmin):
             "Abrir presentación en Whatsapp",
         )
     presentacion_whatsapp.short_description = "Mensaje Previo"
+
+    def has_change_permission(self, request, obj=None):
+        has_change_permission = super().has_change_permission(request, obj)
+
+        if not has_change_permission:
+            return False
+
+        return not (obj and obj.resultado.cerrado)
 
     def get_formset_kwargs(self, request: HttpRequest, obj: Entrevista, inline, prefix):
         form = super().get_formset_kwargs(request, obj, inline, prefix)
@@ -193,15 +207,26 @@ class EntrevistaAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
 
-        if request.method == "GET":
-            self._evaluar(request, object_id)
+        self._evaluar(request, object_id)
 
-            entrevista: Entrevista = self.get_object(request, object_id)
-            extra_context["puede_generar_informe"] = False
-            generador = get_generador(entrevista.resultado if entrevista else None, request)
+        entrevista: Entrevista = self.get_object(request, object_id)
+        extra_context["puede_generar_informe"] = False
+        generador = get_generador(entrevista.resultado if entrevista else None, request)
 
-            if generador:
-                extra_context["puede_generar_informe"] = generador.is_valid() and generador.puede_generar_informe()
+        if generador:
+            extra_context["puede_generar_informe"] = generador.is_valid() and generador.puede_generar_informe()
+
+        if request.method == "POST":
+            form_class = self.get_form(request)
+            form = form_class(request.POST, instance=entrevista)
+
+            if form.is_valid():
+                cerrar_evaluacion = form.cleaned_data.get("cerrar_evaluacion")
+
+                if cerrar_evaluacion and not entrevista.resultado.cerrado:
+                        entrevista.resultado.cerrado = True
+                        entrevista.resultado.save()
+                        self.message_user(request, "Evaluación cerrada", messages.SUCCESS)
 
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
@@ -222,7 +247,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
     def _evaluar(self, request, object_id):
         entrevista: Entrevista = self.get_object(request, object_id)
 
-        generador = get_generador(entrevista.resultado, request)
+        generador = get_generador(entrevista.resultado)
 
         if generador:
             generador.evaluar()

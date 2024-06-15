@@ -81,7 +81,7 @@ class Generador(ABC, GIPSService):
                 self.resultado.evaluacion = evaluacion
                 self.resultado.resultado_test = resultado_evaluacion
         except Exception as e:
-            self._add_error_message(f"Error al evaluar resultado: {e}")
+            self._add_error_message(f"Error al evaluar test: {e}")
         else:
             self.resultado.save()
 
@@ -91,7 +91,7 @@ class Generador(ABC, GIPSService):
                 entrevista.observaciones = entrevista.resultado.evaluacion.get("observaciones_initial", "")
                 entrevista.save()
 
-            self._add_success_message("Resultado evaluado")
+            self._add_success_message("Test evaluado")
 
     def puede_generar_informe(self, raise_exception: bool = False) -> bool:
         try:
