@@ -216,6 +216,8 @@ class EntrevistaAdmin(admin.ModelAdmin):
         if generador:
             extra_context["puede_generar_informe"] = generador.is_valid() and generador.puede_generar_informe()
 
+        response = super().change_view(request, object_id, form_url, extra_context=extra_context)
+
         if request.method == "POST":
             form_class = self.get_form(request)
             form = form_class(request.POST, instance=entrevista)
@@ -228,7 +230,7 @@ class EntrevistaAdmin(admin.ModelAdmin):
                         entrevista.resultado.save()
                         self.message_user(request, "Evaluación cerrada", messages.SUCCESS)
 
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+        return response
 
     def get_urls(self):
         urls = super().get_urls()
