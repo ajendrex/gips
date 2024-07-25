@@ -166,3 +166,5 @@ data/
 .env_local
 
 informe.html
+
+frontend/www/node_modules
