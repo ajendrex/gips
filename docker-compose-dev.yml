@@ -13,3 +13,8 @@ services:
     proxy:
         volumes:
           - ./conf/nginx-dev.conf:/etc/nginx/nginx.conf
+
+    wordpress:
+        environment:
+            WP_HOME: http://www.elsicologico.localhost
+            WP_SITEURL: http://www.elsicologico.localhost
