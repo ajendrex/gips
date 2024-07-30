@@ -34,6 +34,14 @@ services:
             - ./shared:/app/shared
             - /media:/app/media
 
+    mysql:
+        networks:
+            - app_net
+    
+    wordpress:
+        networks:
+            - app_net
+
 
 networks:
     app_net:
