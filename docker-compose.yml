@@ -23,6 +23,7 @@ services:
             - SECRET_KEY
             - ALLOWED_HOSTS
             - CSRF_TRUSTED_ORIGINS
+            - BASE_URL
 
     static:
         build:
